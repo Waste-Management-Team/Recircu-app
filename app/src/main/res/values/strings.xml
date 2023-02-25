@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Recircu</string>
+    <string name="plastic">Plastic</string>
+    <string name="metal">Metal</string>
+    <string name="home">Home</string>
+    <string name="explore">Explore</string>
+    <string name="profile">Profile</string>
+    <string name="others">Others</string>
+</resources>
