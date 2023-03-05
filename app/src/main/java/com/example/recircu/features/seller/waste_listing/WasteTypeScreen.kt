@@ -112,7 +112,7 @@ fun LazyGridScope.wasteTypesGrid(
                     }
                 }
                 Text(
-                    stringResource(wasteType.name),
+                    stringResource(wasteType.titleId),
                     fontSize = 24.sp,
                     fontWeight = FontWeight(600),
                     lineHeight = 29.sp,
@@ -127,7 +127,7 @@ fun LazyGridScope.wasteTypesGrid(
 @Composable
 fun WasteTypeHeading() {
     Column {
-        Spacer(modifier = Modifier.height(80.dp))
+//        Spacer(modifier = Modifier.height(80.dp))
         Text(
             "Waste type",
             style = MaterialTheme.typography.headlineMedium,

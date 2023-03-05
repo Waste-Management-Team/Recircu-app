@@ -1,9 +1,9 @@
 package com.example.recircu.features.seller.seller_dashboard
 
-import android.util.Log
 import androidx.annotation.StringRes
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -21,16 +21,20 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.recircu.R
 import com.example.recircu.core.ui.components.HomeTopAppBar
 import com.example.recircu.core.ui.icon.RecircuIcon
 import com.example.recircu.core.ui.icon.RecircuIcons
+import com.example.recircu.core.ui.removeWidthConstraint
 import com.example.recircu.core.ui.theme.RecircuTheme
 import com.example.recircu.core.ui.theme.fontFamily
 
@@ -41,8 +45,14 @@ fun SellerHomeRoute(modifier: Modifier = Modifier) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SellerHomeScreen(modifier: Modifier = Modifier) {
+fun SellerHomeScreen(
+    modifier: Modifier = Modifier,
+    viewModel: SellerHomeViewModel = hiltViewModel()
+) {
+    val userState by viewModel.userState.collectAsStateWithLifecycle()
+    val state by viewModel.state.collectAsStateWithLifecycle()
 
+    val res = LocalContext.current.resources
     LazyVerticalGrid(
         state = rememberLazyGridState(),
         columns = GridCells.Adaptive(300.dp),
@@ -54,24 +64,51 @@ fun SellerHomeScreen(modifier: Modifier = Modifier) {
             .then(modifier)
     ) {
         item(span = { GridItemSpan(maxLineSpan) }) {
-            HomeTopAppBar(scrollBehavior = null)
+            HomeTopAppBar(scrollBehavior = null, userState = userState)
         }
         item(span = { GridItemSpan(maxLineSpan) }) {
             AccountBalance()
         }
         item(span = { GridItemSpan(maxLineSpan) }) {
-            WasteFilterRow()
+            WasteFilterRow(
+                modifier = Modifier.removeWidthConstraint(16.dp),
+                wasteTypes = state.wasteTypes,
+                filterBuyersAds = viewModel::filterBuyersAds
+            )
         }
         item(span = { GridItemSpan(maxLineSpan) }) {
-            BuyersSection()
+            BuyersSection(
+                modifier = Modifier.removeWidthConstraint(16.dp),
+                buyerAds = state.buyerAds,
+                filters = state.filter
+            )
         }
     }
 }
 
 @Composable
-fun BuyersSection() {
-    Column(modifier = Modifier.fillMaxWidth()) {
-        Box(modifier = Modifier.fillMaxWidth()) {
+fun BuyersSection(
+    modifier: Modifier = Modifier,
+    buyerAds: List<BuyerAd>,
+    filters: List<WasteType>
+) {
+    val filteredAds =
+        buyerAds.filter { buyerAd ->
+            buyerAd.wasteType.titleId in filters.map { it.titleId }
+        }
+
+    val ads =
+        if (filters.isEmpty()) buyerAds else filteredAds
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .then(modifier),
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+        ) {
             Text(
                 "Buyers",
                 fontSize = 20.sp,
@@ -90,59 +127,83 @@ fun BuyersSection() {
             )
         }
         Spacer(modifier = Modifier.height(12.dp))
-        BuyersAds()
+        if (ads.isEmpty()) {
+            EmptyBuyersAds()
+        } else {
+            BuyersAds(
+                buyerAds = ads
+            )
+        }
     }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun BuyersAds(
+    buyerAds: List<BuyerAd>
+) {
+    LazyRow(
+        contentPadding = PaddingValues(16.dp),
+        horizontalArrangement = Arrangement.spacedBy(20.dp)
+    ) {
+        items(buyerAds, key = { it.buyerId }) {
+            BuyerAdItem(
+                buyerAd = it,
+                modifier = Modifier.animateItemPlacement()
+            )
+        }
+    }
+
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BuyersAds() {
-    LazyRow {
-        item {
-            OutlinedCard(
-                onClick = { },
-                colors = CardDefaults.outlinedCardColors(containerColor = Color(0xFFE2FFE9)),
-                border = BorderStroke(1.dp, Color(0xFF00801C)),
-                shape = RoundedCornerShape(10.dp)
-            ) {
-                Column(
-                    modifier = Modifier
-                        .heightIn(209.dp)
-                        .widthIn(135.dp)
-                        .padding(
-                            start = 12.dp,
-                            top = 16.dp,
-                            end = 12.dp,
-                            bottom = 32.dp
-                        )
-                ) {
-                    Image(
-                        painter = painterResource(R.drawable.ellipse),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .size(64.dp)
-                            .align(Alignment.CenterHorizontally)
-                    )
-                    Spacer(modifier = Modifier.height(54.dp))
-                    Text(
-                        "Plastic",
-                        fontSize = 18.sp,
-                        lineHeight = 22.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        fontFamily = fontFamily
-                    )
-                    Text(
-                        "20kg",
-                        fontSize = 14.sp,
-                        lineHeight = 17.sp,
-                        fontFamily = fontFamily,
-                        fontWeight = FontWeight(400)
-                    )
-                }
-            }
+fun BuyerAdItem(
+    buyerAd: BuyerAd,
+    modifier: Modifier = Modifier
+) {
+    OutlinedCard(
+        onClick = { },
+        colors = CardDefaults.outlinedCardColors(containerColor = Color(0xFFE2FFE9)),
+        border = BorderStroke(1.dp, Color(0xFF00801C)),
+        shape = RoundedCornerShape(10.dp),
+        modifier = modifier
+    ) {
+        Column(
+            modifier = Modifier
+                .heightIn(209.dp)
+                .widthIn(135.dp)
+                .padding(
+                    start = 12.dp,
+                    top = 16.dp,
+                    end = 12.dp,
+                    bottom = 32.dp
+                )
+        ) {
+            Image(
+                painter = painterResource(R.drawable.ellipse),
+                contentDescription = null,
+                modifier = Modifier
+                    .size(64.dp)
+                    .align(Alignment.CenterHorizontally)
+            )
+            Spacer(modifier = Modifier.height(54.dp))
+            Text(
+                stringResource(buyerAd.wasteType.titleId),
+                fontSize = 18.sp,
+                lineHeight = 22.sp,
+                fontWeight = FontWeight.SemiBold,
+                fontFamily = fontFamily
+            )
+            Text(
+                buyerAd.weight.toString().plus("kg"),
+                fontSize = 14.sp,
+                lineHeight = 17.sp,
+                fontFamily = fontFamily,
+                fontWeight = FontWeight(400)
+            )
         }
     }
-
 }
 
 @Composable
@@ -172,34 +233,31 @@ fun EmptyBuyersAds() {
 }
 
 @Composable
-fun WasteFilterRow() {
-    val wasteTypes = listOf(
-        WasteType.Plastic,
-        WasteType.Metal,
-        WasteType.Plastic,
-        WasteType.Others
-    )
-    val checkedTypes = mutableListOf<Int>()
-
+fun WasteFilterRow(
+    modifier: Modifier = Modifier,
+    wasteTypes: MutableSet<WasteType>,
+    filterBuyersAds: (WasteType, Boolean) -> Unit
+) {
     LazyRow(
         state = rememberLazyListState(),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
-        modifier = Modifier.fillMaxWidth()
+        contentPadding = PaddingValues(16.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .then(modifier)
     ) {
-        items(items = wasteTypes/*, key = { it.name }*/) {
+        items(items = wasteTypes.toList(), key = { it.titleId.hashCode() }) {
             var isSelected by rememberSaveable {
-                mutableStateOf(false)
+                mutableStateOf(it.isSelected)
             }
             val surfaceColor by animateColorAsState(
                 targetValue = if (isSelected) Color(0xFF00821D) else Color(0xFFC1C1C1)
             )
-            WasteFilterElement(icon = it.icon, title = it.name, isSelected, surfaceColor) {
-                if (isSelected) {
-                    checkedTypes.remove(it)
-                } else {
-                    checkedTypes.add(it)
-                }
-                Log.d("WasteFilterStringResIds", checkedTypes.toString())
+            WasteFilterElement(
+                wasteType = it,
+                isSelected, surfaceColor
+            ) { wasteType ->
+                filterBuyersAds.invoke(wasteType, wasteType.isSelected)
                 isSelected = !isSelected
             }
         }
@@ -209,15 +267,14 @@ fun WasteFilterRow() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WasteFilterElement(
-    icon: RecircuIcon,
-    @StringRes title: Int,
+    wasteType: WasteType,
     isSelected: Boolean,
     color: Color,
-    onSelect: (Int) -> Unit
+    onSelect: (WasteType) -> Unit
 ) {
     Surface(
         selected = isSelected,
-        onClick = { onSelect.invoke(title) },
+        onClick = { onSelect.invoke(wasteType) },
         shape = RoundedCornerShape(5.dp),
         color = color,
         contentColor = Color.White
@@ -229,16 +286,16 @@ fun WasteFilterElement(
                 .widthIn(min = 91.dp)
                 .padding(horizontal = 12.dp, vertical = 10.dp)
         ) {
-            when (icon) {
+            when (wasteType.icon) {
                 is RecircuIcon.PainterResourceIcon -> {
-                    Image(painter = painterResource(icon.id), contentDescription = null)
+                    Image(painter = painterResource(wasteType.icon.id), contentDescription = null)
                 }
                 is RecircuIcon.ImageVectorIcon -> {
-                    Image(imageVector = icon.imageVector, contentDescription = null)
+                    Image(imageVector = wasteType.icon.imageVector, contentDescription = null)
                 }
             }
             Text(
-                stringResource(title),
+                stringResource(wasteType.titleId),
                 fontSize = 16.sp,
                 fontWeight = FontWeight.SemiBold,
                 lineHeight = 20.sp,
@@ -284,20 +341,34 @@ fun AccountBalance() {
     }
 }
 
-sealed class WasteType(val icon: RecircuIcon, @StringRes val name: Int) {
+sealed class WasteType(
+    val icon: RecircuIcon,
+    @StringRes val titleId: Int,
+    var isSelected: Boolean = false
+) {
     object Plastic : WasteType(
         icon = RecircuIcon.PainterResourceIcon(RecircuIcons.Plastic),
-        name = R.string.plastic
+        titleId = R.string.plastic
     )
 
     object Metal : WasteType(
         icon = RecircuIcon.PainterResourceIcon(RecircuIcons.Metal),
-        name = R.string.metal
+        titleId = R.string.metal
+    )
+
+    object Paper : WasteType(
+        icon = RecircuIcon.PainterResourceIcon(RecircuIcons.Metal),
+        titleId = R.string.paper
+    )
+
+    object Glass : WasteType(
+        icon = RecircuIcon.PainterResourceIcon(RecircuIcons.Metal),
+        titleId = R.string.glass
     )
 
     object Others : WasteType(
         icon = RecircuIcon.PainterResourceIcon(RecircuIcons.Metal),
-        name = R.string.others
+        titleId = R.string.others
     )
 }
 

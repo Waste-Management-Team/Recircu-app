@@ -6,4 +6,10 @@
     <string name="explore">Explore</string>
     <string name="profile">Profile</string>
     <string name="others">Others</string>
+    <string name="empty_string" />
+    <string name="waste_detail">Details</string>
+    <string name="paper">Paper</string>
+    <string name="glass">Glass</string>
+    <string name="welcome_back">Welcome Back</string>
+    <string name="null_string">Null</string>
 </resources>

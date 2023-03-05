@@ -5,11 +5,11 @@ import com.example.recircu.R
 import com.example.recircu.core.ui.icon.RecircuIcon
 import com.example.recircu.core.ui.icon.RecircuIcons
 
-enum class SellerBottomBarDestination(
-    val selectedIcon: RecircuIcon,
-    val unselectedIcon: RecircuIcon,
-    @StringRes val iconTextId: Int,
-    @StringRes val titleTextId: Int
+enum class RecircuTopLevelDestination(
+    val selectedIcon: RecircuIcon? = null,
+    val unselectedIcon: RecircuIcon? = null,
+    @StringRes val iconTextId: Int? = null,
+    @StringRes val titleTextId: Int? = null
 ) {
     SELLER_HOME(
         selectedIcon = RecircuIcon.ImageVectorIcon(RecircuIcons.Home),
@@ -28,5 +28,6 @@ enum class SellerBottomBarDestination(
         unselectedIcon = RecircuIcon.ImageVectorIcon(RecircuIcons.PersonOutline),
         iconTextId = R.string.profile,
         titleTextId = R.string.profile
-    )
+    ),
+    GETTING_STARTED
 }

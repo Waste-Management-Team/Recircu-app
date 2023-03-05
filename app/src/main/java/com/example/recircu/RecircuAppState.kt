@@ -35,11 +35,12 @@ class RecircuAppState(
         @Composable get() = navController
             .currentBackStackEntryAsState().value?.destination
 
-    val currentSellerBottomBarDestination: SellerBottomBarDestination?
+    val currentRecircuTopLevelDestination: RecircuTopLevelDestination?
         @Composable get() = when (currentDestination?.route) {
-            sellerHomeRoute -> SellerBottomBarDestination.SELLER_HOME
-            sellerExploreRoute -> SellerBottomBarDestination.EXPLORE
-            sellerProfileRoute -> SellerBottomBarDestination.PROFILE
+            sellerHomeRoute -> RecircuTopLevelDestination.SELLER_HOME
+            sellerExploreRoute -> RecircuTopLevelDestination.EXPLORE
+            sellerProfileRoute -> RecircuTopLevelDestination.PROFILE
+            gettingStartedRoute -> RecircuTopLevelDestination.GETTING_STARTED
             else -> null
         }
 
@@ -52,8 +53,11 @@ class RecircuAppState(
     val shouldShowFloatingActionButton: Boolean
         @Composable get() = currentDestination?.route == sellerHomeRoute
 
-    val sellerBottomBarDestinations: List<SellerBottomBarDestination> =
-        SellerBottomBarDestination.values().toList()
+    val recircuTopLevelDestinations: List<RecircuTopLevelDestination> =
+        RecircuTopLevelDestination.values().toList()
+
+    val sellerBottomBarDestinations: List<RecircuTopLevelDestination> =
+        RecircuTopLevelDestination.values().toList().dropLast(1)
 
     private val bottomBarEnabledRoutes = listOf(
         sellerHomeRoute,
@@ -69,7 +73,7 @@ class RecircuAppState(
         navController.navigate(route)
     }
 
-    fun navigationToSellerBottomBarTopLevelDestination(sellerBottomBarDestination: SellerBottomBarDestination) {
+    fun navigationToSellerBottomBarTopLevelDestination(recircuTopLevelDestination: RecircuTopLevelDestination) {
         val topLevelNavOptions = navOptions {
             launchSingleTop = true
             restoreState = true
@@ -77,16 +81,26 @@ class RecircuAppState(
                 saveState = true
             }
         }
-        when (sellerBottomBarDestination) {
-            SellerBottomBarDestination.SELLER_HOME -> navController.navigateToSellerGraph(
+        when (recircuTopLevelDestination) {
+            RecircuTopLevelDestination.SELLER_HOME -> navController.navigateToSellerGraph(
                 topLevelNavOptions
             )
-            SellerBottomBarDestination.EXPLORE -> navController.navigateToSellerExplore(
+            RecircuTopLevelDestination.EXPLORE -> navController.navigateToSellerExplore(
                 topLevelNavOptions
             )
-            SellerBottomBarDestination.PROFILE -> navController.navigateToSellerProfile(
+            RecircuTopLevelDestination.PROFILE -> navController.navigateToSellerProfile(
                 topLevelNavOptions
             )
+            else -> {}
         }
     }
+
+    fun onNavigateUp() {
+        navController.navigateUp()
+    }
+
+    fun onBackClick() {
+        navController.popBackStack()
+    }
+
 }

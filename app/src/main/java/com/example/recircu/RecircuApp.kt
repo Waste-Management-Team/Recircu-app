@@ -8,7 +8,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -18,7 +17,7 @@ import androidx.navigation.NavDestination.Companion.hierarchy
 import com.example.recircu.core.ui.components.RecircuTopBar
 import com.example.recircu.core.ui.icon.RecircuIcon
 import com.example.recircu.navigation.RecircuNavHost
-import com.example.recircu.navigation.SellerBottomBarDestination
+import com.example.recircu.navigation.RecircuTopLevelDestination
 import com.example.recircu.navigation.wasteTypeRoute
 
 @OptIn(
@@ -30,9 +29,9 @@ fun RecircuApp(
     appState: RecircuAppState = rememberRecircuAppState()
 ) {
     appState.shouldDisplayEdgeToEdge?.let { onDisplayEdgeToEdgeImmersive.invoke(it) }
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(
+    /*val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(
         rememberTopAppBarState()
-    )
+    )*/
     Scaffold(
 //        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
@@ -40,8 +39,9 @@ fun RecircuApp(
             if (appState.shouldShowTopAppBar) {
                 RecircuTopBar(
                     currentDestination = appState.currentDestination,
-                    currentBottomBarDestination = appState.currentSellerBottomBarDestination,
-                    scrollBehavior = scrollBehavior
+                    topLevelDestination = appState.currentRecircuTopLevelDestination,
+                    scrollBehavior = null,
+                    navigateUp = { appState.onBackClick() }
                 )
             }
         },
@@ -84,9 +84,9 @@ fun RecircuApp(
 
 @Composable
 fun RecircuBottomBar(
-    destinations: List<SellerBottomBarDestination>,
+    destinations: List<RecircuTopLevelDestination>,
     currentDestination: NavDestination?,
-    onNavigateToDestination: (SellerBottomBarDestination) -> Unit,
+    onNavigateToDestination: (RecircuTopLevelDestination) -> Unit,
     modifier: Modifier = Modifier
 ) {
     NavigationBar(
@@ -108,17 +108,18 @@ fun RecircuBottomBar(
                         is RecircuIcon.ImageVectorIcon -> {
                             Icon(
                                 imageVector = icon.imageVector,
-                                contentDescription = stringResource(destination.iconTextId),
+                                contentDescription = stringResource(destination.iconTextId!!),
 //                                tint = Color(0xFF00821D)
                             )
                         }
                         is RecircuIcon.PainterResourceIcon -> {
                             Icon(
                                 painter = painterResource(icon.id),
-                                contentDescription = stringResource(destination.iconTextId),
+                                contentDescription = stringResource(destination.iconTextId!!),
 //                                tint = Color(0xFF00821D)
                             )
                         }
+                        else -> {}
                     }
                 },
                 colors = NavigationBarItemDefaults.colors(
@@ -133,7 +134,7 @@ fun RecircuBottomBar(
     }
 }
 
-fun NavDestination?.isBottomBarDestinationInHierarchy(bottomBarDestination: SellerBottomBarDestination) =
+fun NavDestination?.isBottomBarDestinationInHierarchy(bottomBarDestination: RecircuTopLevelDestination) =
     this?.hierarchy?.any {
         it.route?.contains(bottomBarDestination.name, ignoreCase = true) ?: false
     } ?: false

@@ -34,100 +34,86 @@ fun WasteDetailsScreen(modifier: Modifier = Modifier) {
     var estimatedQuantityInput by remember {
         mutableStateOf("")
     }
-    Column(
+    LazyVerticalGrid(
+        state = rememberLazyGridState(),
+        columns = GridCells.Adaptive(300.dp),
+        contentPadding = PaddingValues(16.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
         modifier = Modifier
             .fillMaxSize()
             .then(modifier)
     ) {
-        MediumTopAppBar(
-            title = {
-                Text(
-                    "Details",
-                    style = MaterialTheme.typography.headlineMedium
-                )
-            }
-        )
-        LazyVerticalGrid(
-            state = rememberLazyGridState(),
-            columns = GridCells.Adaptive(300.dp),
-            contentPadding = PaddingValues(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            modifier = Modifier
-                .fillMaxSize()
-                .then(modifier)
-        ) {
-            item {
-                DetailsTextField(
-                    label = "Location",
-                    value = locationInput,
-                    onTextChange = { locationInput = it }
-                )
-            }
-            item { Spacer(modifier = Modifier.height(14.dp)) }
-            item {
-                DetailsTextField(
-                    label = "Estimated Quantity",
-                    value = estimatedQuantityInput,
-                    onTextChange = { estimatedQuantityInput = it }
-                )
-            }
-            item {
-                Text(
-                    text = buildAnnotatedString {
-                        append("Price: ")
-                        addStyle(
-                            SpanStyle(
-                                color = Color(0xFFA0A0A0)
-                            ),
-                            0,
-                            "Price: ".length,
-                        )
-                        pushStyle(
-                            SpanStyle(color = Color(0xFF00821D))
-                        )
-                        append("N2,000")
-                        toAnnotatedString()
-                    },
-                    style = MaterialTheme.typography.titleSmall,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .wrapContentWidth(Alignment.End)
-                )
-            }
-            item {
-                Column(
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .border(BorderStroke(1.dp, Color(0xFF00801C)))
-                        .padding(vertical = 36.dp)
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.upload_icon),
-                        contentDescription = null,
-                        modifier = Modifier.size(32.dp),
-                        tint = Color(0xFF00801C)
+        item {
+            DetailsTextField(
+                label = "Location",
+                value = locationInput,
+                onTextChange = { locationInput = it }
+            )
+        }
+        item { Spacer(modifier = Modifier.height(14.dp)) }
+        item {
+            DetailsTextField(
+                label = "Estimated Quantity",
+                value = estimatedQuantityInput,
+                onTextChange = { estimatedQuantityInput = it }
+            )
+        }
+        item {
+            Text(
+                text = buildAnnotatedString {
+                    append("Price: ")
+                    addStyle(
+                        SpanStyle(
+                            color = Color(0xFFA0A0A0)
+                        ),
+                        0,
+                        "Price: ".length,
                     )
-                    Spacer(modifier = Modifier.height(24.dp))
-                    RecircuButton(
-                        onClick = {},
-                        modifier = Modifier.width(197.dp),
-                        label = "Upload Image"
+                    pushStyle(
+                        SpanStyle(color = Color(0xFF00821D))
                     )
-                }
-            }
-            item {
-                Spacer(modifier = Modifier.height(30.dp))
-            }
-            item {
+                    append("N2,000")
+                    toAnnotatedString()
+                },
+                style = MaterialTheme.typography.titleSmall,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentWidth(Alignment.End)
+            )
+        }
+        item {
+            Column(
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .border(BorderStroke(1.dp, Color(0xFF00801C)))
+                    .padding(vertical = 36.dp)
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.upload_icon),
+                    contentDescription = null,
+                    modifier = Modifier.size(32.dp),
+                    tint = Color(0xFF00801C)
+                )
+                Spacer(modifier = Modifier.height(24.dp))
                 RecircuButton(
-                    onClick = { },
-                    label = "Done",
-                    modifier = Modifier.fillMaxWidth()
+                    onClick = {},
+                    modifier = Modifier.width(197.dp),
+                    label = "Upload Image"
                 )
             }
+        }
+        item {
+            Spacer(modifier = Modifier.height(30.dp))
+        }
+        item {
+            RecircuButton(
+                onClick = { },
+                label = "Done",
+                modifier = Modifier.fillMaxWidth()
+            )
         }
     }
 }
