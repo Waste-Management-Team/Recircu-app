@@ -10,6 +10,7 @@ import com.google.accompanist.navigation.animation.AnimatedNavHost
 @Composable
 fun RecircuNavHost(
     navController: NavHostController,
+    showScheduleBottomSheet: () -> Unit,
     modifier: Modifier = Modifier,
     startDestination: String = gettingStartedRoute
 ) {
@@ -24,7 +25,9 @@ fun RecircuNavHost(
                 wasteTypeScreen(
                     navigateToWasteDetails = { navController.navigateToWasteDetails() }
                 )
-                wasteDetailsScreen()
+                wasteDetailsScreen(
+                    showScheduleBottomSheet = showScheduleBottomSheet
+                )
             }
         )
         sellerExploreScreen()

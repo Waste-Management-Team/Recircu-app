@@ -5,7 +5,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import com.example.recircu.features.seller.seller_dashboard.WasteType
-import com.example.recircu.features.seller.waste_listing.WasteTypeRoute
+import com.example.recircu.features.seller.waste_type_selection.WasteTypeRoute
 import com.google.accompanist.navigation.animation.composable
 
 const val wasteTypeRoute = "waste_type_route"

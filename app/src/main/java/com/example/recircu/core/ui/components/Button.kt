@@ -2,6 +2,7 @@ package com.example.recircu.core.ui.components
 
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -13,8 +14,8 @@ fun RecircuButton(
     onClick: () -> Unit,
     label: String,
     modifier: Modifier = Modifier,
-    containerColor: Color = Color(0xFF00801C),
-    contentColor: Color = Color.White
+    containerColor: Color = MaterialTheme.colorScheme.primary,
+    contentColor: Color = MaterialTheme.colorScheme.onPrimary
 ) {
     Button(
         onClick = onClick,

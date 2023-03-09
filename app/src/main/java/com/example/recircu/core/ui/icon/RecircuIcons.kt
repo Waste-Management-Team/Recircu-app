@@ -2,12 +2,8 @@ package com.example.recircu.core.ui.icon
 
 import androidx.annotation.DrawableRes
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AddBox
-import androidx.compose.material.icons.filled.Explore
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.AddBox
-import androidx.compose.material.icons.outlined.Explore
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.PersonOutline
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -22,6 +18,10 @@ object RecircuIcons {
     val PersonOutline = Icons.Outlined.PersonOutline
     val Explore = Icons.Filled.AddBox
     val ExploreOutline = Icons.Outlined.AddBox
+    val Notifications = R.drawable.notification_icon
+    val Location = R.drawable.location
+    val MyLocation = Icons.Filled.MyLocation
+    val Clear = Icons.Filled.Clear
 }
 
 sealed interface RecircuIcon {

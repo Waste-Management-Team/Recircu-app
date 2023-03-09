@@ -4,7 +4,7 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
-import com.example.recircu.features.seller.waste_listing.WasteDetailsRoute
+import com.example.recircu.features.seller.waste_type_selection.WasteDetailsRoute
 import com.google.accompanist.navigation.animation.composable
 
 const val wasteDetailsRoute = "waste_details_route"
@@ -14,8 +14,8 @@ fun NavController.navigateToWasteDetails(navOptions: NavOptions? = null) {
 }
 
 @OptIn(ExperimentalAnimationApi::class)
-fun NavGraphBuilder.wasteDetailsScreen() {
+fun NavGraphBuilder.wasteDetailsScreen(showScheduleBottomSheet: () -> Unit) {
     composable(wasteDetailsRoute) {
-        WasteDetailsRoute()
+        WasteDetailsRoute(showScheduleBottomSheet = showScheduleBottomSheet)
     }
 }

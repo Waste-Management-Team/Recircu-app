@@ -24,7 +24,7 @@ class SellerHomeViewModel @Inject constructor() : ViewModel() {
     private var _userState: MutableStateFlow<UserState> = MutableStateFlow(UserState.Loading)
     val userState: StateFlow<UserState> get() = _userState.asStateFlow()
 
-    var wasteTypes = MutableStateFlow(
+    private val wasteTypes = MutableStateFlow(
         mutableSetOf<WasteType>()
     )
 
@@ -82,24 +82,25 @@ class SellerHomeViewModel @Inject constructor() : ViewModel() {
         }
         if (!isSelected) {
             viewModelScope.launch {
-                val a = _state.value.filter.toMutableList()
-                a.add(wasteType)
+                val filter = _state.value.filter.toMutableList()
+                filter.add(wasteType)
                 _state.update {
-                    it.copy(filter = a)
+                    it.copy(filter = filter)
                 }
             }
         } else {
             viewModelScope.launch {
-                val a = _state.value.filter.toMutableList()
-                a.remove(wasteType)
+                val filter = _state.value.filter.toMutableList()
+                filter.remove(wasteType)
                 _state.update {
-                    it.copy(filter = a)
+                    it.copy(filter = filter)
                 }
             }
         }
     }
 }
 
+//Todo: include the user state in the uiState
 sealed interface UserState {
     object Loading : UserState
     data class Success(
@@ -117,12 +118,4 @@ data class BuyerAd(
     val wasteType: WasteType,
     val weight: Int,
     val buyerId: Int
-)
-
-data class SellerHomeUiState(
-    val isLoading: Boolean = false,
-    val accountBalance: Int = 0,
-    val wasteTypes: MutableSet<WasteType> = mutableSetOf(),
-    val filter: List<WasteType> = emptyList(),
-    val buyerAds: List<BuyerAd> = emptyList()
 )
