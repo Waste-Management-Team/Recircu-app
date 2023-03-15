@@ -3,6 +3,7 @@ package com.godzuche.recircu
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.godzuche.recircu.domain.location.LocationClient
 import com.godzuche.recircu.domain.model.UserData
 import com.godzuche.recircu.domain.repository.UserDataRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -14,6 +15,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AppMainViewModel @Inject constructor(
+    private val locationClient: LocationClient,
     private val userDataRepository: UserDataRepository
 ) : ViewModel() {
     val uiState: StateFlow<MainActivityUiState> = userDataRepository.userData.map {
@@ -35,8 +37,8 @@ class AppMainViewModel @Inject constructor(
         permission: String,
         isGranted: Boolean
     ) {
-        if (!isGranted){
-            visiblePermissionDialogQueue.add( permission)
+        if (!isGranted) {
+            visiblePermissionDialogQueue.add(permission)
         }
     }
 }

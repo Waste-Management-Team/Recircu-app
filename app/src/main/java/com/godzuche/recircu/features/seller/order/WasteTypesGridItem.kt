@@ -1,4 +1,4 @@
-package com.godzuche.recircu.features.seller.waste_type_selection
+package com.godzuche.recircu.features.seller.order
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape

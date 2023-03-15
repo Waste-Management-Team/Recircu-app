@@ -79,9 +79,8 @@ class MainActivity : ComponentActivity() {
                     }
                 }
                 RecircuApp(
+                    openLocationSettings = ::openLocationSettings,
                     onDisplayEdgeToEdgeImmersive = { shouldDisplayEdgeToEdge ->
-
-
                         if (shouldDisplayEdgeToEdge) {
                             DisposableEffect(
                                 systemUiController,
@@ -155,5 +154,11 @@ fun Activity.openAppSettings() {
     Intent(
         Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
         Uri.fromParts("package", packageName, null)
+    ).also(::startActivity)
+}
+
+fun Activity.openLocationSettings() {
+    Intent(
+        Settings.ACTION_LOCATION_SOURCE_SETTINGS
     ).also(::startActivity)
 }

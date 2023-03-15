@@ -1,9 +1,10 @@
 package com.godzuche.recircu.features.google_maps
 
+import android.location.Location
 import com.google.maps.android.compose.MapProperties
-import com.google.maps.android.compose.MapType
 
 data class MapsState(
+    val lastLocation: Location? = null,
     val properties: MapProperties = MapProperties(
         isMyLocationEnabled = true
     ),

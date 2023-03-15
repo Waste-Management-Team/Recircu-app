@@ -1,7 +1,6 @@
 package com.godzuche.recircu.features.seller.seller_dashboard
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -31,33 +30,12 @@ fun BuyerAdsSection(
 
     val ads =
         if (filters.isEmpty()) buyerAds else filteredAds
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .then(modifier),
+
+    HomeSection(
+        title = stringResource(R.string.buyers),
+        actionText = stringResource(R.string.see_all),
+        onActionClicked = {},
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-        ) {
-            Text(
-                stringResource(R.string.buyers),
-                fontSize = 20.sp,
-                lineHeight = 25.sp,
-                fontFamily = fontFamily,
-                modifier = Modifier.align(Alignment.CenterStart)
-            )
-            Text(
-                stringResource(R.string.see_all),
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier
-                    .align(Alignment.CenterEnd)
-                    .clickable { }
-            )
-        }
-        Spacer(modifier = Modifier.height(12.dp))
         if (ads.isEmpty()) {
             EmptyBuyersAds()
         } else {
@@ -67,6 +45,7 @@ fun BuyerAdsSection(
         }
     }
 }
+
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable

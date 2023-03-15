@@ -1,4 +1,4 @@
-package com.godzuche.recircu.features.seller.waste_type_selection
+package com.godzuche.recircu.features.seller.order
 
 import android.location.Location
 import android.net.Uri

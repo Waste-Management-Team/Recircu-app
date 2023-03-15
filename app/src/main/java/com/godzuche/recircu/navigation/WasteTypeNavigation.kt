@@ -4,8 +4,8 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
+import com.godzuche.recircu.features.seller.order.WasteTypeRoute
 import com.godzuche.recircu.features.seller.seller_dashboard.WasteType
-import com.godzuche.recircu.features.seller.waste_type_selection.WasteTypeRoute
 import com.google.accompanist.navigation.animation.composable
 
 const val wasteTypeRoute = "waste_type_route"

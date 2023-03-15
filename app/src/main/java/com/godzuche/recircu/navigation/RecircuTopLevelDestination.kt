@@ -12,20 +12,26 @@ enum class RecircuTopLevelDestination(
     @StringRes val titleTextId: Int? = null
 ) {
     SELLER_HOME(
-        selectedIcon = RecircuIcon.ImageVectorIcon(RecircuIcons.Home),
-        unselectedIcon = RecircuIcon.ImageVectorIcon(RecircuIcons.HomeOutline),
+        selectedIcon = RecircuIcon.ImageVectorIcon(imageVector = RecircuIcons.Home),
+        unselectedIcon = RecircuIcon.ImageVectorIcon(imageVector = RecircuIcons.HomeOutline),
         iconTextId = R.string.home,
         titleTextId = R.string.home
     ),
     EXPLORE(
-        selectedIcon = RecircuIcon.ImageVectorIcon(RecircuIcons.Explore),
-        unselectedIcon = RecircuIcon.ImageVectorIcon(RecircuIcons.ExploreOutline),
+        selectedIcon = RecircuIcon.ImageVectorIcon(imageVector = RecircuIcons.Explore),
+        unselectedIcon = RecircuIcon.ImageVectorIcon(imageVector = RecircuIcons.ExploreOutline),
         iconTextId = R.string.explore,
         titleTextId = R.string.explore
     ),
+    CONNECT(
+        selectedIcon = RecircuIcon.ImageVectorIcon(imageVector = RecircuIcons.People),
+        unselectedIcon = RecircuIcon.ImageVectorIcon(imageVector = RecircuIcons.PeopleOutline),
+        iconTextId = R.string.connect,
+        titleTextId = R.string.connect
+    ),
     PROFILE(
-        selectedIcon = RecircuIcon.ImageVectorIcon(RecircuIcons.Person),
-        unselectedIcon = RecircuIcon.ImageVectorIcon(RecircuIcons.PersonOutline),
+        selectedIcon = RecircuIcon.ImageVectorIcon(imageVector = RecircuIcons.Person),
+        unselectedIcon = RecircuIcon.ImageVectorIcon(imageVector = RecircuIcons.PersonOutline),
         iconTextId = R.string.profile,
         titleTextId = R.string.profile
     ),

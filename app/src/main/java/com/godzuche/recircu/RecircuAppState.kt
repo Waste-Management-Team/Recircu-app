@@ -9,7 +9,6 @@ import androidx.navigation.navOptions
 import com.godzuche.recircu.navigation.*
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.MutableStateFlow
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
@@ -37,6 +36,7 @@ class RecircuAppState(
         @Composable get() = when (currentDestination?.route) {
             sellerHomeRoute -> RecircuTopLevelDestination.SELLER_HOME
             sellerExploreRoute -> RecircuTopLevelDestination.EXPLORE
+            connectRoute -> RecircuTopLevelDestination.CONNECT
             sellerProfileRoute -> RecircuTopLevelDestination.PROFILE
             gettingStartedRoute -> RecircuTopLevelDestination.GETTING_STARTED
             else -> null
@@ -45,9 +45,9 @@ class RecircuAppState(
     val shouldDisplayEdgeToEdge: Boolean?
         @Composable get() = currentDestination?.route?.let { it == gettingStartedRoute }
 
-    var shouldShowBottomSheet = MutableStateFlow(false)
+/*    var shouldShowBottomSheet = MutableStateFlow(false)
     var bottomSheetContent: MutableStateFlow<RecircuBottomSheetContent?> =
-        MutableStateFlow(null)
+        MutableStateFlow(null)*/
 
     val shouldShowTopAppBar
         @Composable get() = shouldDisplayEdgeToEdge == false
@@ -61,15 +61,26 @@ class RecircuAppState(
     val sellerBottomBarDestinations: List<RecircuTopLevelDestination> =
         RecircuTopLevelDestination.values().toList().dropLast(1)
 
+    /* var shouldShowDialog by mutableStateOf(false)
+         private set*/
+
     private val bottomBarEnabledRoutes = listOf(
         sellerHomeRoute,
         sellerExploreRoute,
+        connectRoute,
         sellerProfileRoute,
         wasteTypeRoute,
         wasteDetailsRoute
     )
     val shouldShowBottomBar: Boolean
         @Composable get() = currentDestination?.route in bottomBarEnabledRoutes
+
+/*    var currentDialog by mutableStateOf<RecircuDialog?>(null)
+
+    fun setShowDialog(shouldShow: Boolean, uiEvent: AppUiEvent.ShowDialog? = null) {
+        shouldShowDialog = shouldShow
+        currentDialog = uiEvent?.dialog
+    }*/
 
     fun navigateToRoute(route: String) {
         navController.navigate(route)
@@ -84,15 +95,18 @@ class RecircuAppState(
             }
         }
         when (recircuTopLevelDestination) {
-            RecircuTopLevelDestination.SELLER_HOME -> navController.navigateToSellerGraph(
-                topLevelNavOptions
-            )
-            RecircuTopLevelDestination.EXPLORE -> navController.navigateToSellerExplore(
-                topLevelNavOptions
-            )
-            RecircuTopLevelDestination.PROFILE -> navController.navigateToSellerProfile(
-                topLevelNavOptions
-            )
+            RecircuTopLevelDestination.SELLER_HOME -> {
+                navController.navigateToSellerGraph(topLevelNavOptions)
+            }
+            RecircuTopLevelDestination.EXPLORE -> {
+                navController.navigateToSellerExplore(topLevelNavOptions)
+            }
+            RecircuTopLevelDestination.CONNECT -> {
+                navController.navigateToCommunity(topLevelNavOptions)
+            }
+            RecircuTopLevelDestination.PROFILE -> {
+                navController.navigateToSellerProfile(topLevelNavOptions)
+            }
             else -> {}
         }
     }

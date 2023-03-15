@@ -11,6 +11,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
+import com.godzuche.recircu.RecircuDialog
 
 @Composable
 fun PermissionDialog(
@@ -76,38 +77,56 @@ class FineLocationPermissionTextProvider : PermissionTextProvider {
 
 @Composable
 fun RecircuDialog(
+    recircuDialog: RecircuDialog,
     onDismiss: () -> Unit,
-    onConfirm: () -> Unit
+    onConfirm: () -> Unit,
+    onDismissRequest: () -> Unit = {}
 ) {
     AlertDialog(
-        onDismissRequest = { },
-        title = {},
+        onDismissRequest = onDismissRequest,
+        title = {
+            recircuDialog.title?.let {
+                //
+            }
+        },
         text = {
-            Text(
-                text = "For a better experience, turn on device location, which uses Google's location service."
-            )
+            recircuDialog.text?.let {
+                Text(
+                    text = it
+                )
+            }
         },
         dismissButton = {
-            Text(
-                text = "No, thanks",
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { }
-                    .padding(16.dp)
-            )
+            recircuDialog.dismissText?.let {
+                Text(
+                    text = it,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { onDismiss.invoke() }
+                        .padding(16.dp)
+                )
+            }
         },
         confirmButton = {
-            Text(
-                text = "OK",
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { }
-                    .padding(16.dp)
-            )
-        }
+            recircuDialog.confirmText?.let {
+                Text(
+                    text = "OK",
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            onConfirm.invoke()
+                        }
+                        .padding(16.dp)
+                )
+            }
+        },
+        properties = DialogProperties(
+            dismissOnBackPress = true,
+            dismissOnClickOutside = true
+        )
     )
 }

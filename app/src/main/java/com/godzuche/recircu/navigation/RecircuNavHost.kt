@@ -32,6 +32,7 @@ fun RecircuNavHost(
             }
         )
         sellerExploreScreen()
+        connectScreen()
         sellerProfileScreen()
     }
 }

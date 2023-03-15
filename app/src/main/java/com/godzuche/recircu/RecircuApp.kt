@@ -1,5 +1,6 @@
 package com.godzuche.recircu
 
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -18,13 +19,17 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
+import com.godzuche.recircu.core.ui.components.RecircuDialog
 import com.godzuche.recircu.core.ui.components.RecircuNavigationDefaults
 import com.godzuche.recircu.core.ui.components.RecircuNavigationItem
 import com.godzuche.recircu.core.ui.components.RecircuTopBar
 import com.godzuche.recircu.core.ui.icon.RecircuIcon
 import com.godzuche.recircu.features.google_maps.MapsRoute
+import com.godzuche.recircu.features.google_maps.MapsViewModel
 import com.godzuche.recircu.features.seller.schedule.ScheduleBottomSheetContent
 import com.godzuche.recircu.navigation.RecircuNavHost
 import com.godzuche.recircu.navigation.RecircuTopLevelDestination
@@ -36,7 +41,9 @@ import kotlinx.coroutines.launch
 )
 @Composable
 fun RecircuApp(
+    mapsViewModel: MapsViewModel = hiltViewModel(),
     onDisplayEdgeToEdgeImmersive: @Composable (Boolean) -> Unit,
+    openLocationSettings: () -> Unit,
     appState: RecircuAppState = rememberRecircuAppState()
 ) {
     appState.shouldDisplayEdgeToEdge?.let { onDisplayEdgeToEdgeImmersive.invoke(it) }
@@ -49,6 +56,30 @@ fun RecircuApp(
     val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
         bottomSheetState = bottomSheetState
     )
+
+    val dialogState by mapsViewModel.dialogState.collectAsStateWithLifecycle()
+    if (dialogState.shouldShow) {
+        dialogState.dialog?.let {
+            RecircuDialog(
+                recircuDialog = it,
+                onDismissRequest = {
+                    Log.d("Dialogw", "onDismissRequest")
+//                    appState.setShowDialog(false)
+                    mapsViewModel.setDialogState(shouldShow = false)
+                },
+                onDismiss = {
+                    Log.d("Dialogw", "dismiss")
+//                    appState.setShowDialog(false)
+                    mapsViewModel.setDialogState(shouldShow = false)
+                },
+                onConfirm = {
+                    Log.d("Dialogw", "confirm")
+                    mapsViewModel.setDialogState(shouldShow = false)
+                    openLocationSettings.invoke()
+                }
+            )
+        }
+    }
 
     BottomSheetScaffold(
         sheetContent = {
@@ -140,7 +171,6 @@ fun RecircuApp(
             }
         }
     }
-//    }
 }
 
 @Composable
@@ -200,6 +230,6 @@ fun NavDestination?.isBottomBarDestinationInHierarchy(bottomBarDestination: Reci
 @Composable
 fun AppPreview() {
     MaterialTheme {
-        RecircuApp(onDisplayEdgeToEdgeImmersive = {})
+        RecircuApp(onDisplayEdgeToEdgeImmersive = {}, openLocationSettings = {})
     }
 }

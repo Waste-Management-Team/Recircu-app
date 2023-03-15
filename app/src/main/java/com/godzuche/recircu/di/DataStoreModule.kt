@@ -4,8 +4,6 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationServices
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -23,12 +21,6 @@ object DataStoreModule {
     fun providesUserPreferencesDataStore(
         @ApplicationContext context: Context
     ): DataStore<Preferences> = context.userPreferences
-
-    @Provides
-    @Singleton
-    fun providesFusedLocationProviderClient(
-        @ApplicationContext context: Context
-    ): FusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context)
 
     @Provides
     @Singleton
