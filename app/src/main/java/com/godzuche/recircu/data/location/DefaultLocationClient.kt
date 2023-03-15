@@ -4,16 +4,15 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.location.Location
 import android.location.LocationManager
+import android.util.Log
 import com.godzuche.recircu.core.util.hasLocationPermission
 import com.godzuche.recircu.domain.location.LocationClient
 import com.google.android.gms.location.FusedLocationProviderClient
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.coroutines.coroutineContext
 
 class DefaultLocationClient @Inject constructor(
     private val context: Context,
@@ -21,11 +20,12 @@ class DefaultLocationClient @Inject constructor(
 ) : LocationClient {
     @SuppressLint("MissingPermission")
     override fun getLocation(): Flow<LocationResult> {
-//        val coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
-        return flow {
-            val a = coroutineContext
+        return callbackFlow {
             if (!context.hasLocationPermission()) {
-                LocationResult.Error(errorType = LocationErrorType.MISSING_PERMISSION)
+                launch {
+                    send(LocationResult.Error(errorType = LocationErrorType.MISSING_PERMISSION))
+                    Log.d("Location", "getLocation() called err gps")
+                }
 //                throw LocationClient.LocationException("Missing location permission")
             }
             val locationManager =
@@ -34,17 +34,24 @@ class DefaultLocationClient @Inject constructor(
             val isNetworkEnabled =
                 locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
             if (!isGpsEnabled && !isNetworkEnabled) {
-                LocationResult.Error(errorType = LocationErrorType.DISABLED_GPS)
+                launch {
+                    send(LocationResult.Error(errorType = LocationErrorType.DISABLED_GPS))
+                    Log.d("Location", "getLocation() called err gps")
+                }
 //                throw LocationClient.LocationException("GPS is disabled")
             }
 
             val lastLocationResult = client.lastLocation
             lastLocationResult.addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    CoroutineScope(a).launch(Dispatchers.IO) {
-                        emit(LocationResult.Success(task.result))
+                    launch {
+                        send(LocationResult.Success(task.result))
+                        Log.d("Location", "getLocation() called success")
                     }
                 }
+            }
+            awaitClose {
+                // Not needed
             }
         }
     }
