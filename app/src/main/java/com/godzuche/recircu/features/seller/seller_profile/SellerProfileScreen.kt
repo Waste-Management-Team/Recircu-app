@@ -1,6 +1,7 @@
 package com.godzuche.recircu.features.seller.seller_profile
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -27,13 +28,17 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import coil.size.Size
+import com.godzuche.recircu.core.ui.components.RecircuAnimatedCircle
 import com.godzuche.recircu.features.seller.seller_dashboard.HomeSection
+import com.godzuche.recircu.features.seller.seller_dashboard.WasteType
 
 @Composable
 fun SellerProfileRoute(modifier: Modifier = Modifier) {
@@ -76,96 +81,217 @@ fun SellerProfileScreen(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Row(
-                        verticalAlignment = Alignment.Top,
-                        modifier = Modifier
-                            .border(
-                                border = BorderStroke(
-                                    width = 1.dp,
-                                    color = MaterialTheme.colorScheme.outline.copy(alpha = 0.25f)
-                                ),
-                                shape = RoundedCornerShape(10.dp)
-                            )
-                            .weight(1f)
-                            .padding(8.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.Diamond,
-                            contentDescription = null,
-                            tint = Color.Cyan
-                        )
-                        Column {
-                            Text(
-                                text = "Diamond",
-                                style = MaterialTheme.typography.titleMedium
-                            )
-                            Text(
-                                text = "Current Rank",
-                                color = MaterialTheme.colorScheme.outline.copy(0.25f),
-                                style = MaterialTheme.typography.bodyMedium
-                            )
-                            Spacer(modifier = Modifier.height(4.dp))
-                            LinearProgressIndicator(
-                                progress = 0.6f,
-                                modifier = Modifier.width(
-                                    ((screenWidth - 40.dp) / 2) - 16.dp - 32.dp
-                                )
-                            )
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Text(
-                                text = "60%",
-                                color = MaterialTheme.colorScheme.primary,
-                                style = MaterialTheme.typography.bodyMedium,
-                                modifier = Modifier.align(Alignment.End)
-                            )
-                        }
-                    }
-                    Row(
-                        verticalAlignment = Alignment.Top,
-                        modifier = Modifier
-                            .border(
-                                border = BorderStroke(
-                                    width = 1.dp,
-                                    color = MaterialTheme.colorScheme.outline.copy(0.25f)
-                                ),
-                                shape = RoundedCornerShape(10.dp)
-                            )
-                            .weight(1f)
-                            .padding(8.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.Bolt,
-                            contentDescription = null,
-                            tint = Color.Yellow
-                        )
-                        Column {
-                            Text(
-                                text = "105",
-                                style = MaterialTheme.typography.titleMedium
-                            )
-                            Text(
-                                text = "Total XP",
-                                color = MaterialTheme.colorScheme.outline.copy(0.25f),
-                                style = MaterialTheme.typography.bodyMedium
-                            )
-                            Spacer(modifier = Modifier.height(4.dp))
-                            LinearProgressIndicator(
-                                progress = 0.6f,
-                                modifier = Modifier.width(
-                                    ((screenWidth - 40.dp) / 2) - 16.dp - 32.dp
-                                )
-                            )
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Text(
-                                text = "105/150",
-                                color = MaterialTheme.colorScheme.primary,
-                                style = MaterialTheme.typography.bodyMedium,
-                                modifier = Modifier.align(Alignment.End)
-                            )
-                        }
-                    }
+                    Rank(
+                        modifier = Modifier.weight(1f),
+                        screenWidth = screenWidth
+                    )
+                    Xp(
+                        modifier = Modifier.weight(1f),
+                        screenWidth = screenWidth
+                    )
                 }
             }
+        }
+        item(span = { GridItemSpan(maxLineSpan) }) {
+            val totalWasteRecycled = 20
+            val recycledWasteStats = listOf<Triple<WasteType, Float, Color>>(
+                Triple(WasteType.Plastic, 0.35f, Color.Cyan),
+                Triple(WasteType.Metal, 0.2f, Color.Blue),
+                Triple(WasteType.Paper, 0.25f, Color.Yellow),
+                Triple(WasteType.Glass, 0.07f, Color.Green),
+                Triple(WasteType.Others, 0.13f, Color.Gray),
+            )
+
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                AnimatedCircularProportion(
+                    items = recycledWasteStats,
+                    screenWidth = screenWidth,
+                    modifier = Modifier.weight(1f)
+                )
+                WasteProportionsBreakdown(
+                    recycledWasteStats = recycledWasteStats,
+                    totalWasteRecycled = totalWasteRecycled,
+                    modifier = Modifier.weight(1f)
+                )
+            }
+        }
+        item(span = { GridItemSpan(maxLineSpan) }) {
+            HomeSection(
+                title = "Achievements"
+            ) {
+
+            }
+        }
+    }
+}
+
+@Composable
+fun WasteProportionsBreakdown(
+    recycledWasteStats: List<Triple<WasteType, Float, Color>>,
+    totalWasteRecycled: Int,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        recycledWasteStats.forEach {
+            val proportion = it.second
+            val amount = proportion * totalWasteRecycled
+            val percent = proportion * 100
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .clip(CircleShape)
+                            .size(18.dp)
+                            .background(it.third)
+                    )
+                    Text(
+                        text = stringResource(id = it.first.titleId),
+                        style = MaterialTheme.typography.labelSmall
+                    )
+                }
+                Text(
+                    text = amount.toString() + "kg",
+                    style = MaterialTheme.typography.labelSmall
+                )
+                Text(
+                    text = "$percent %",
+                    style = MaterialTheme.typography.labelSmall
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun AnimatedCircularProportion(
+    items: List<Triple<WasteType, Float, Color>>,
+    screenWidth: Dp,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = modifier
+    ) {
+        RecircuAnimatedCircle(
+            items = items,
+            modifier = Modifier.size(((screenWidth - 32.dp - 8.dp) / 2))
+        )
+        Text(
+            text = "20kg",
+            style = MaterialTheme.typography.headlineSmall
+        )
+    }
+}
+
+@Composable
+fun Xp(
+    screenWidth: Dp,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        verticalAlignment = Alignment.Top,
+        modifier = modifier
+            .border(
+                border = BorderStroke(
+                    width = 1.dp,
+                    color = MaterialTheme.colorScheme.outline.copy(0.6f)
+                ),
+                shape = RoundedCornerShape(10.dp)
+            )
+            .padding(8.dp)
+    ) {
+        Icon(
+            imageVector = Icons.Filled.Bolt,
+            contentDescription = null,
+            tint = Color.Yellow
+        )
+        Column {
+            Text(
+                text = "105",
+                style = MaterialTheme.typography.titleMedium
+            )
+            Text(
+                text = "Total XP",
+                color = MaterialTheme.colorScheme.outline.copy(0.6f),
+                style = MaterialTheme.typography.bodyMedium
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            LinearProgressIndicator(
+                progress = 0.6f,
+                modifier = Modifier.width(
+                    ((screenWidth - 40.dp) / 2) - 16.dp - 32.dp
+                )
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = "105/150",
+                color = MaterialTheme.colorScheme.primary,
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.align(Alignment.End)
+            )
+        }
+    }
+}
+
+@Composable
+fun Rank(
+    screenWidth: Dp,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        verticalAlignment = Alignment.Top,
+        modifier = modifier
+            .border(
+                border = BorderStroke(
+                    width = 1.dp,
+                    color = MaterialTheme.colorScheme.outline.copy(alpha = 0.6f)
+                ),
+                shape = RoundedCornerShape(10.dp)
+            )
+            .padding(8.dp)
+    ) {
+        Icon(
+            imageVector = Icons.Filled.Diamond,
+            contentDescription = null,
+            tint = Color.Cyan
+        )
+        Column {
+            Text(
+                text = "Diamond",
+                style = MaterialTheme.typography.titleMedium
+            )
+            Text(
+                text = "Current Rank",
+                color = MaterialTheme.colorScheme.outline.copy(0.6f),
+                style = MaterialTheme.typography.bodyMedium
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            LinearProgressIndicator(
+                progress = 0.6f,
+                modifier = Modifier.width(
+                    ((screenWidth - 40.dp) / 2) - 16.dp - 32.dp
+                )
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = "60%",
+                color = MaterialTheme.colorScheme.primary,
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.align(Alignment.End)
+            )
         }
     }
 }
@@ -227,11 +353,11 @@ fun Balance() {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "59 Recs",
+                    text = "59 Rec",
                     style = MaterialTheme.typography.titleLarge
                 )
                 Text(
-                    text = "Recircoins",
+                    text = "Recircoin",
                     style = MaterialTheme.typography.titleSmall
                 )
             }

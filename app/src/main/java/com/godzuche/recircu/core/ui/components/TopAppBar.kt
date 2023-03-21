@@ -112,7 +112,8 @@ fun RecircuTopBar(
     if (topLevelDestination != null) {
         if (topLevelDestination != RecircuTopLevelDestination.SELLER_HOME) {
             MediumTopAppBar(
-                title = { Text(stringResource(topLevelDestination.titleTextId!!)) }
+                title = { Text(stringResource(topLevelDestination.titleTextId!!)) },
+                scrollBehavior = scrollBehavior
             )
         } else Unit
     } else {
@@ -128,7 +129,8 @@ fun RecircuTopBar(
                                     contentDescription = null
                                 )
                             }
-                        }
+                        },
+                        scrollBehavior = scrollBehavior
                     )
                 }
                 else -> {
@@ -146,7 +148,8 @@ fun RecircuTopBar(
                                     contentDescription = null
                                 )
                             }
-                        }
+                        },
+                        scrollBehavior = scrollBehavior
                     )
                 }
             }

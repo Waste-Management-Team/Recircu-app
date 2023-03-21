@@ -11,14 +11,13 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.*
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -37,6 +36,7 @@ import com.godzuche.recircu.features.google_maps.MapsViewModel
 import com.godzuche.recircu.features.seller.schedule.ScheduleBottomSheetContent
 import com.godzuche.recircu.navigation.RecircuNavHost
 import com.godzuche.recircu.navigation.RecircuTopLevelDestination
+import com.godzuche.recircu.navigation.sellerHomeRoute
 import com.godzuche.recircu.navigation.wasteTypeRoute
 import kotlinx.coroutines.launch
 
@@ -56,6 +56,8 @@ fun RecircuApp(
     var bottomSheetContent: RecircuBottomSheetContent? by remember {
         mutableStateOf(null)
     }
+    val topAppBarState = rememberTopAppBarState()
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(state = topAppBarState)
     val bottomSheetState = rememberBottomSheetState(initialValue = BottomSheetValue.Collapsed)
     val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
         bottomSheetState = bottomSheetState
@@ -115,14 +117,18 @@ fun RecircuApp(
         sheetGesturesEnabled = false
     ) {
         Scaffold(
-//        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+            modifier = if (appState.shouldShowTopAppBar && appState.currentDestination?.route != sellerHomeRoute) {
+                Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
+            } else {
+                Modifier
+            },
             contentWindowInsets = WindowInsets(0, 0, 0, 0),
             topBar = {
                 if (appState.shouldShowTopAppBar) {
                     RecircuTopBar(
                         currentDestination = appState.currentDestination,
                         topLevelDestination = appState.currentRecircuTopLevelDestination,
-                        scrollBehavior = null,
+                        scrollBehavior = scrollBehavior,
                         navigateUp = { appState.onBackClick() }
                     )
                 }
@@ -133,13 +139,13 @@ fun RecircuApp(
                     enter = slideInVertically(
                         animationSpec = tween(),
                         initialOffsetY = {
-                            it*2
+                            it * 2
                         }
                     ),
                     exit = slideOutVertically(
                         animationSpec = tween(),
                         targetOffsetY = {
-                            it*2
+                            it * 2
                         }
                     )
                 ) {
