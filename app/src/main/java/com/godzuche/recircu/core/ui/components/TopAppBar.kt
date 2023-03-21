@@ -159,6 +159,7 @@ fun String.toTitleTextId(): Int? {
     return when (this) {
         wasteTypeRoute -> R.string.empty_string
         wasteDetailsRoute -> R.string.waste_detail
+        buyerDetailsRoute -> R.string.buyer
         else -> R.string.empty_string
     }
 }

@@ -65,6 +65,9 @@ class MainActivity : ComponentActivity() {
         setContent {
             val systemUiController = rememberSystemUiController()
             val useDarkIcons = !isSystemInDarkTheme()
+            /*var shouldShowEdgeToEdge by remember {
+                mutableStateOf(true)
+            }*/
 
             RecircuTheme {
                 val dialogQueue = viewModel.visiblePermissionDialogQueue
@@ -72,7 +75,7 @@ class MainActivity : ComponentActivity() {
                     contract = ActivityResultContracts.RequestMultiplePermissions()
                 ) { perms ->
                     perms.keys.forEach { permission ->
-                        viewModel.onPermissioResult(
+                        viewModel.onPermissionResult(
                             permission = permission,
                             isGranted = perms[permission] == true
                         )
@@ -81,12 +84,12 @@ class MainActivity : ComponentActivity() {
                 RecircuApp(
                     openLocationSettings = ::openLocationSettings,
                     onDisplayEdgeToEdgeImmersive = { shouldDisplayEdgeToEdge ->
-                        if (shouldDisplayEdgeToEdge) {
-                            DisposableEffect(
-                                systemUiController,
-                                useDarkIcons,
-                                shouldDisplayEdgeToEdge
-                            ) {
+                        DisposableEffect(
+                            systemUiController,
+                            useDarkIcons,
+                            shouldDisplayEdgeToEdge
+                        ) {
+                            if (shouldDisplayEdgeToEdge) {
                                 systemUiController.isStatusBarVisible = false
                                 systemUiController.systemBarsBehavior =
                                     WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
@@ -96,10 +99,8 @@ class MainActivity : ComponentActivity() {
                                     darkIcons = useDarkIcons
                                 )
                                 systemUiController.systemBarsDarkContentEnabled = useDarkIcons
-                                onDispose {}
-                            }
-                        } else {
-                            DisposableEffect(systemUiController, useDarkIcons) {
+                                onDispose { }
+                            } else {
                                 systemUiController.isStatusBarVisible = true
                                 systemUiController.systemBarsBehavior =
                                     WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE

@@ -2,6 +2,10 @@ package com.godzuche.recircu
 
 import android.util.Log
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
@@ -124,7 +128,21 @@ fun RecircuApp(
                 }
             },
             bottomBar = {
-                if (appState.shouldShowBottomBar) {
+                AnimatedVisibility(
+                    visible = appState.shouldShowBottomBar,
+                    enter = slideInVertically(
+                        animationSpec = tween(),
+                        initialOffsetY = {
+                            it*2
+                        }
+                    ),
+                    exit = slideOutVertically(
+                        animationSpec = tween(),
+                        targetOffsetY = {
+                            it*2
+                        }
+                    )
+                ) {
                     RecircuBottomBar(
                         destinations = appState.sellerBottomBarDestinations,
                         currentDestination = appState.currentDestination,

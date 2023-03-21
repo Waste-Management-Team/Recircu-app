@@ -33,7 +33,7 @@ class AppMainViewModel @Inject constructor(
     }
 
     // from the activity result
-    fun onPermissioResult(
+    fun onPermissionResult(
         permission: String,
         isGranted: Boolean
     ) {

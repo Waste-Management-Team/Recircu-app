@@ -9,8 +9,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
+@Preview(showBackground = true)
 @Composable
 fun AccountBalance() {
     Surface(
@@ -26,7 +28,6 @@ fun AccountBalance() {
             Text(
                 "Balance",
                 style = MaterialTheme.typography.titleSmall,
-//                color = Color.White
             )
             Spacer(modifier = Modifier.height(12.dp))
             Text(
@@ -40,9 +41,36 @@ fun AccountBalance() {
                 shape = RoundedCornerShape(5.dp),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(80.dp)
+//                    .height(80.dp)
             ) {
+                AchievementSummary()
             }
         }
+    }
+}
+
+@Composable
+fun AchievementSummary() {
+    Column(
+        modifier = Modifier.padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = "Waste Recycled: 20kg",
+                style = MaterialTheme.typography.labelMedium
+            )
+            Text(
+                text = "Total Points: 239",
+                style = MaterialTheme.typography.labelMedium
+            )
+        }
+        Text(
+            text = "Total Recircoin earned: 27 Rec",
+            style = MaterialTheme.typography.labelMedium
+        )
     }
 }

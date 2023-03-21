@@ -2,15 +2,19 @@ package com.godzuche.recircu.features.seller.order
 
 import android.location.Location
 import android.net.Uri
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.*
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -40,6 +44,8 @@ import com.godzuche.recircu.core.ui.components.LocationTextField
 import com.godzuche.recircu.core.ui.components.RecircuButton
 import com.godzuche.recircu.core.ui.icon.RecircuIcons
 import com.godzuche.recircu.features.google_maps.MapsViewModel
+import com.godzuche.recircu.features.google_maps.PlacesAutocompleteResult
+import com.google.android.gms.maps.model.LatLng
 
 @Composable
 fun WasteDetailsRoute(
@@ -48,10 +54,22 @@ fun WasteDetailsRoute(
     mapsViewModel: MapsViewModel = hiltViewModel()
 ) {
     val lastLocation by mapsViewModel.lastLocation.collectAsStateWithLifecycle()
+    val selectedLocation by mapsViewModel.selectedLocation.collectAsStateWithLifecycle()
+    val locationAutofill by mapsViewModel.locationAutofill.collectAsStateWithLifecycle()
     WasteDetailsScreen(
         lastLocation = lastLocation,
+        locationAutofill = locationAutofill,
+        selectedLocation = selectedLocation,
         showScheduleBottomSheet = showScheduleBottomSheet,
-        modifier = modifier
+        modifier = modifier,
+        onLocationQueryChange = {
+            mapsViewModel.onSearchPlaces(it)
+        },
+        onPlaceClick = {
+            // Todo: use event class
+            mapsViewModel.stopPlacesSearch()
+//            mapsViewModel.getCordinates(it)
+        }
     )
 }
 
@@ -59,6 +77,10 @@ fun WasteDetailsRoute(
 fun WasteDetailsScreen(
     lastLocation: Location?,
     showScheduleBottomSheet: (RecircuBottomSheetContent) -> Unit,
+    locationAutofill: List<PlacesAutocompleteResult>,
+    selectedLocation: LatLng,
+    onLocationQueryChange: (String) -> Unit,
+    onPlaceClick: (PlacesAutocompleteResult) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var locationInput by remember {
@@ -78,33 +100,69 @@ fun WasteDetailsScreen(
             .then(modifier)
     ) {
         item {
-            LocationTextField(
-                label = stringResource(R.string.location),
-                value = locationInput,
-                onValueChange = { locationInput = it },
-                trailingIcon = {
-                    AnimatedVisibility(
-                        visible = locationInput.isNotEmpty(),
-                        enter = fadeIn() + expandIn(expandFrom = Alignment.Center),
-                        exit = shrinkOut(shrinkTowards = Alignment.Center) + fadeOut()
-                    ) {
-                        IconButton(
-                            onClick = { locationInput = "" }
+            Column {
+                LocationTextField(
+                    label = stringResource(R.string.location),
+                    value = locationInput,
+                    onValueChange = {
+                        Log.d("Places", "${locationAutofill.isEmpty()}")
+                        locationInput = it
+                        onLocationQueryChange.invoke(it)
+                    },
+                    trailingIcon = {
+                        AnimatedVisibility(
+                            visible = locationInput.isNotEmpty(),
+                            enter = fadeIn() + expandIn(expandFrom = Alignment.Center),
+                            exit = shrinkOut(shrinkTowards = Alignment.Center) + fadeOut()
                         ) {
-                            Icon(
-                                imageVector = RecircuIcons.Clear,
-                                contentDescription = null
-                            )
+                            IconButton(
+                                onClick = { locationInput = "" }
+                            ) {
+                                Icon(
+                                    imageVector = RecircuIcons.Clear,
+                                    contentDescription = null
+                                )
+                            }
+                        }
+                    },
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        imeAction = ImeAction.Next,
+                        autoCorrect = false
+                    ),
+                    onGetMyLocationFromMap = {
+                        showScheduleBottomSheet.invoke(
+                            RecircuBottomSheetContent.MAP
+                        )
+                    },
+                    singleLine = true
+                )
+
+                AnimatedVisibility(
+                    visible = locationAutofill.isNotEmpty(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)
+                ) {
+                    LazyColumn(
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        items(locationAutofill) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp)
+                                    .clickable {
+                                        locationInput = it.address
+                                        // Todo: Use an event class instead
+                                        onPlaceClick.invoke(it)
+                                    }
+                            ) {
+
+                            }
                         }
                     }
-                },
-                keyboardOptions = KeyboardOptions.Default.copy(
-                    imeAction = ImeAction.Next,
-                    autoCorrect = false
-                ),
-                onGetMyLocationFromMap = { showScheduleBottomSheet.invoke(RecircuBottomSheetContent.MAP) },
-                singleLine = true
-            )
+                }
+            }
         }
         item { Spacer(modifier = Modifier.height(14.dp)) }
         item {
@@ -214,5 +272,14 @@ private fun Price(amount: String = "2,000") {
 @Preview(showBackground = true)
 @Composable
 fun WasteDetailsPreview() {
-    MaterialTheme { WasteDetailsScreen(showScheduleBottomSheet = {}, lastLocation = null) }
+    MaterialTheme {
+        WasteDetailsScreen(
+            lastLocation = null,
+            showScheduleBottomSheet = {},
+            locationAutofill = emptyList(),
+            selectedLocation = LatLng(0.0, 0.0),
+            onPlaceClick = {},
+            onLocationQueryChange = {}
+        )
+    }
 }

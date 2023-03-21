@@ -21,8 +21,14 @@ fun RecircuNavHost(
     ) {
         gettingStartedScreen(navigateToDashboard = { navController.navigate(sellerHomeRoute) })
         sellerHomeGraph(
-            navigateToWasteTypes = { navController.navigateToWasteType() },
+            navigateToWasteTypes = {
+                navController.navigateToWasteType()
+            },
+            navigateToBuyer = {
+                navController.navigateToBuyer()
+            },
             nestedGraphs = {
+                buyerDetailsScreen()
                 wasteTypeScreen(
                     navigateToWasteDetails = { navController.navigateToWasteDetails() }
                 )

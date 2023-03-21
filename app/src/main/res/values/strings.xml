@@ -24,4 +24,6 @@
     <string name="next">Next</string>
     <string name="upload_image">Upload Image</string>
     <string name="connect">Connect</string>
+    <string name="green_tip_of_the_day">Green tip of the day</string>
+    <string name="buyer">Buyer</string>
 </resources>

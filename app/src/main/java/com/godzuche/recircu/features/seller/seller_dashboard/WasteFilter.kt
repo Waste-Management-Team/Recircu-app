@@ -56,7 +56,6 @@ fun WasteFilterRow(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WasteFilterItem(
     wasteType: WasteType,

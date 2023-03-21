@@ -4,6 +4,7 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
+import com.godzuche.recircu.features.seller.seller_dashboard.BuyerAd
 import com.godzuche.recircu.features.seller.seller_dashboard.SellerHomeRoute
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.navigation
@@ -18,6 +19,7 @@ fun NavController.navigateToSellerGraph(navOptions: NavOptions? = null) {
 @OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.sellerHomeGraph(
     navigateToWasteTypes: () -> Unit,
+    navigateToBuyer: (BuyerAd) -> Unit,
     nestedGraphs: NavGraphBuilder.() -> Unit
 ) {
     navigation(
@@ -25,7 +27,9 @@ fun NavGraphBuilder.sellerHomeGraph(
         startDestination = sellerHomeRoute
     ) {
         composable(sellerHomeRoute) {
-            SellerHomeRoute()
+            SellerHomeRoute(
+                navigateToBuyer = navigateToBuyer
+            )
         }
         nestedGraphs()
     }

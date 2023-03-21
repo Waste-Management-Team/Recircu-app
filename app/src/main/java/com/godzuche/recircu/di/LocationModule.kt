@@ -3,6 +3,8 @@ package com.godzuche.recircu.di
 import android.content.Context
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import com.google.android.libraries.places.api.Places
+import com.google.android.libraries.places.api.net.PlacesClient
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -19,4 +21,10 @@ object LocationModule {
     fun providesFusedLocationProviderClient(
         @ApplicationContext context: Context
     ): FusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context)
+
+    @Provides
+    @Singleton
+    fun providesPlacesClient(
+        @ApplicationContext context: Context
+    ): PlacesClient = Places.createClient(context)
 }

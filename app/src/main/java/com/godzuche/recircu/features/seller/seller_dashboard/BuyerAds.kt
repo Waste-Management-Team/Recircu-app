@@ -1,5 +1,7 @@
 package com.godzuche.recircu.features.seller.seller_dashboard
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
@@ -17,11 +19,13 @@ import androidx.compose.ui.unit.sp
 import com.godzuche.recircu.R
 import com.godzuche.recircu.core.ui.theme.fontFamily
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun BuyerAdsSection(
     modifier: Modifier = Modifier,
     buyerAds: List<BuyerAd>,
-    filters: List<WasteType>
+    filters: List<WasteType>,
+    navigateToBuyerDetail: (BuyerAd) -> Unit
 ) {
     val filteredAds =
         buyerAds.filter { buyerAd ->
@@ -36,12 +40,16 @@ fun BuyerAdsSection(
         actionText = stringResource(R.string.see_all),
         onActionClicked = {},
     ) {
-        if (ads.isEmpty()) {
-            EmptyBuyersAds()
-        } else {
-            BuyersAds(
-                buyerAds = ads
-            )
+        AnimatedContent(targetState = ads.isEmpty()) { isEmpty ->
+            if (isEmpty) {
+                EmptyBuyersAds()
+            } else {
+                BuyersAds(
+                    buyerAds = ads,
+                    navigateToBuyerDetail = navigateToBuyerDetail,
+                    modifier = modifier
+                )
+            }
         }
     }
 }
@@ -50,16 +58,22 @@ fun BuyerAdsSection(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun BuyersAds(
-    buyerAds: List<BuyerAd>
+    buyerAds: List<BuyerAd>,
+    navigateToBuyerDetail: (BuyerAd) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     LazyRow(
         contentPadding = PaddingValues(16.dp),
-        horizontalArrangement = Arrangement.spacedBy(20.dp)
+        horizontalArrangement = Arrangement.spacedBy(20.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .then(modifier)
     ) {
         items(buyerAds, key = { it.buyerId }) {
             BuyerAdItem(
                 buyerAd = it,
-                modifier = Modifier.animateItemPlacement()
+                modifier = Modifier.animateItemPlacement(),
+                onClick = { navigateToBuyerDetail.invoke(it) }
             )
         }
     }
@@ -86,7 +100,7 @@ fun EmptyBuyersAds() {
             lineHeight = 22.sp,
             fontWeight = FontWeight.SemiBold,
             fontFamily = fontFamily,
-            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.25f)
+            color = MaterialTheme.colorScheme.outline.copy(0.25f)
         )
     }
 }
@@ -95,11 +109,11 @@ fun EmptyBuyersAds() {
 @Composable
 fun BuyerAdItem(
     buyerAd: BuyerAd,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     OutlinedCard(
-        onClick = {
-        },
+        onClick = onClick,
         shape = RoundedCornerShape(10.dp),
         modifier = modifier
     ) {

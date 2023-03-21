@@ -1,8 +1,7 @@
 package com.godzuche.recircu
 
 sealed interface AppUiEvent {
-    data class ShowBottomSheet(val sheetContent: RecircuBottomSheetContent) : AppUiEvent
-    data class ShowDialog(val dialog: RecircuDialog) : AppUiEvent
+    data class Navigate(val route: String) : AppUiEvent
 }
 
 interface RecircuDialog {

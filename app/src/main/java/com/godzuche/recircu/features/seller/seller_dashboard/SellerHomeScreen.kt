@@ -14,6 +14,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -32,6 +33,7 @@ import com.godzuche.recircu.core.ui.theme.fontFamily
 @Composable
 fun SellerHomeRoute(
     modifier: Modifier = Modifier,
+    navigateToBuyer: (BuyerAd) -> Unit,
     viewModel: SellerHomeViewModel = hiltViewModel()
 ) {
     val userState by viewModel.userState.collectAsStateWithLifecycle()
@@ -40,6 +42,7 @@ fun SellerHomeRoute(
         userState = userState,
         uiState = state,
         filterBuyersAds = viewModel::filterBuyersAds,
+        navigateToBuyer = navigateToBuyer,
         modifier = modifier
     )
 }
@@ -50,6 +53,7 @@ fun SellerHomeScreen(
     userState: UserState,
     uiState: SellerHomeUiState,
     filterBuyersAds: (WasteType, Boolean) -> Unit,
+    navigateToBuyer: (BuyerAd) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyVerticalGrid(
@@ -70,7 +74,7 @@ fun SellerHomeScreen(
         }
         item(span = { GridItemSpan(maxLineSpan) }) {
             HomeSection(
-                title = "Green tip of the day"
+                title = stringResource(R.string.green_tip_of_the_day)
             ) {
                 TipOfTheDay()
             }
@@ -86,7 +90,8 @@ fun SellerHomeScreen(
             BuyerAdsSection(
                 modifier = Modifier.removeWidthConstraint(16.dp),
                 buyerAds = uiState.buyerAds,
-                filters = uiState.filter
+                filters = uiState.filter,
+                navigateToBuyerDetail = navigateToBuyer
             )
         }
     }
@@ -136,14 +141,6 @@ fun TipOfTheDay() {
                     tint = MaterialTheme.colorScheme.primary
                 )
             }
-            /*     Text(
-                     text = "More",
-                     style = MaterialTheme.typography.labelLarge,
-                     color = MaterialTheme.colorScheme.primary,
-                     modifier = Modifier
-                         .clickable {
-                         }
-                 )*/
         }
     }
 }
@@ -228,7 +225,8 @@ fun HomePreview() {
     RecircuTheme {
         SellerHomeScreen(uiState = SellerHomeUiState(),
             userState = UserState.Success(user = User("", "Jonah", "")),
-            filterBuyersAds = { a, b -> }
+            filterBuyersAds = { a, b -> },
+            navigateToBuyer = {}
         )
     }
 }

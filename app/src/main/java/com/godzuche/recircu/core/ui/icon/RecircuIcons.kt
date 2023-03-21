@@ -27,6 +27,7 @@ object RecircuIcons {
     val ExpandLess = Icons.Filled.ExpandLess
     val People = Icons.Filled.People
     val PeopleOutline = Icons.Outlined.PeopleOutline
+    val Avatar12 = R.drawable.avatar_12
 }
 
 sealed interface RecircuIcon {

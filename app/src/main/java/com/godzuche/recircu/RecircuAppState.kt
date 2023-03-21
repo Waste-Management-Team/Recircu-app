@@ -69,6 +69,7 @@ class RecircuAppState(
         sellerExploreRoute,
         connectRoute,
         sellerProfileRoute,
+        buyerDetailsRoute,
         wasteTypeRoute,
         wasteDetailsRoute
     )
