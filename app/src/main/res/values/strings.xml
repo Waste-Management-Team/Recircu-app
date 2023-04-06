@@ -26,4 +26,10 @@
     <string name="connect">Connect</string>
     <string name="green_tip_of_the_day">Green tip of the day</string>
     <string name="buyer">Buyer</string>
+    <string name="dont_have_an_account">Don\'t have an account?</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="account">Account</string>
+    <string name="name">Name</string>
+    <string name="last_name">Last Name</string>
+    <string name="first_name">First Name</string>
 </resources>

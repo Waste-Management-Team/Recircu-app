@@ -2,8 +2,8 @@ package com.godzuche.recircu.navigation
 
 import androidx.annotation.StringRes
 import com.godzuche.recircu.R
-import com.godzuche.recircu.core.ui.icon.RecircuIcon
-import com.godzuche.recircu.core.ui.icon.RecircuIcons
+import com.godzuche.recircu.core.designsystem.icon.RecircuIcon
+import com.godzuche.recircu.core.designsystem.icon.RecircuIcons
 
 enum class RecircuTopLevelDestination(
     val selectedIcon: RecircuIcon? = null,

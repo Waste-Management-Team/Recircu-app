@@ -3,9 +3,9 @@ package com.godzuche.recircu
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.godzuche.recircu.domain.location.LocationClient
-import com.godzuche.recircu.domain.model.UserData
-import com.godzuche.recircu.domain.repository.UserDataRepository
+import com.godzuche.recircu.core.domain.location.LocationClient
+import com.godzuche.recircu.core.domain.model.UserData
+import com.godzuche.recircu.core.domain.repository.UserDataRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow

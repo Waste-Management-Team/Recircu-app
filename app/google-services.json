@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "13144629956",
+    "project_id": "waste-380202",
+    "storage_bucket": "waste-380202.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:13144629956:android:09abe6c8f49fccc7bddf91",
+        "android_client_info": {
+          "package_name": "com.godzuche.recircu"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "13144629956-9vor6hcu3e3n517dkl944uo4t9psm605.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.godzuche.recircu",
+            "certificate_hash": "5dd3f6011d78dc7355b29613fd8c9b4666d4f5dd"
+          }
+        },
+        {
+          "client_id": "13144629956-udcbiqf284ugvnpl6c58d9ruijniggcd.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBWMkblUEMKt4i8ydYEtx7NBo_0X-Thouc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "13144629956-udcbiqf284ugvnpl6c58d9ruijniggcd.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

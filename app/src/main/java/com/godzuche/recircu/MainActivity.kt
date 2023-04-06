@@ -1,11 +1,13 @@
 package com.godzuche.recircu
 
+import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.util.Log
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -22,9 +24,9 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.godzuche.recircu.core.ui.components.FineLocationPermissionTextProvider
-import com.godzuche.recircu.core.ui.components.PermissionDialog
-import com.godzuche.recircu.core.ui.theme.RecircuTheme
+import com.godzuche.recircu.core.designsystem.components.FineLocationPermissionTextProvider
+import com.godzuche.recircu.core.designsystem.components.PermissionDialog
+import com.godzuche.recircu.core.designsystem.theme.RecircuTheme
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
@@ -83,6 +85,15 @@ class MainActivity : ComponentActivity() {
                 }
                 RecircuApp(
                     openLocationSettings = ::openLocationSettings,
+                    requestFineLocationPermission = {
+                        Log.d("Location", "reqPerms")
+                        // request permissions yet to be granted
+                        multiplePermissionsResultLauncher.launch(
+                            arrayOf(
+                                Manifest.permission.ACCESS_FINE_LOCATION
+                            )
+                        )
+                    },
                     onDisplayEdgeToEdgeImmersive = { shouldDisplayEdgeToEdge ->
                         DisposableEffect(
                             systemUiController,
@@ -120,7 +131,7 @@ class MainActivity : ComponentActivity() {
                     .forEach { permission ->
                         PermissionDialog(
                             permissionTextProvider = when (permission) {
-                                android.Manifest.permission.ACCESS_FINE_LOCATION -> {
+                                Manifest.permission.ACCESS_FINE_LOCATION -> {
                                     FineLocationPermissionTextProvider()
                                 }
                                 else -> return@forEach
@@ -142,7 +153,7 @@ class MainActivity : ComponentActivity() {
                 LaunchedEffect(true) {
                     multiplePermissionsResultLauncher.launch(
                         arrayOf(
-                            android.Manifest.permission.ACCESS_FINE_LOCATION
+                            Manifest.permission.ACCESS_FINE_LOCATION
                         )
                     )
                 }

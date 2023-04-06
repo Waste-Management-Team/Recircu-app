@@ -11,7 +11,7 @@ interface RecircuDialog {
     val confirmText: String?
 }
 
-class GpsDisabledDialog() : RecircuDialog {
+class GpsDisabledDialog : RecircuDialog {
     override val title: String? = null
     override val text: String = "For a better experience, turn on device location, " +
             "which uses Google's location service."

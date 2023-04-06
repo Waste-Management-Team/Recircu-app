@@ -4,7 +4,11 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
+import androidx.navigation.navOptions
 import com.godzuche.recircu.RecircuBottomSheetContent
+import com.godzuche.recircu.feature.authentication.navigation.authGraph
+import com.godzuche.recircu.feature.authentication.navigation.authGraphRoute
+import com.godzuche.recircu.feature.authentication.navigation.navigateToAuth
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 
 @OptIn(ExperimentalAnimationApi::class)
@@ -12,6 +16,7 @@ import com.google.accompanist.navigation.animation.AnimatedNavHost
 fun RecircuNavHost(
     navController: NavHostController,
     showScheduleBottomSheet: (RecircuBottomSheetContent) -> Unit,
+    requestFineLocationPermission: () -> Unit,
     modifier: Modifier = Modifier,
     startDestination: String = gettingStartedRoute
 ) {
@@ -19,7 +24,31 @@ fun RecircuNavHost(
         navController = navController,
         startDestination = startDestination
     ) {
-        gettingStartedScreen(navigateToDashboard = { navController.navigate(sellerHomeRoute) })
+        gettingStartedScreen(
+//            navigateToDashboard = { navController.navigate(sellerHomeRoute) }
+            navigateToAuthentication = {
+                navController.navigateToAuth()
+            }
+        )
+        authGraph(
+            onSellerClick = {
+                navController.navigateToSellerAuth()
+            },
+            nestedGraph = {
+                sellerAuthGraph(
+                    onSignIn = {
+                        val navOptions = navOptions {
+                            popUpTo(authGraphRoute) {
+                                inclusive = true
+                            }
+                        }
+                        navController.navigate(sellerHomeRoute) {
+                            popUpTo(navController.graph.startDestinationId)
+                        }
+                    }
+                )
+            }
+        )
         sellerHomeGraph(
             navigateToWasteTypes = {
                 navController.navigateToWasteType()
@@ -27,18 +56,35 @@ fun RecircuNavHost(
             navigateToBuyer = {
                 navController.navigateToBuyer()
             },
+            navigateToBuyersAds = {
+                navController.navigateToBuyersAds()
+            },
             nestedGraphs = {
-                buyerDetailsScreen()
-                wasteTypeScreen(
-                    navigateToWasteDetails = { navController.navigateToWasteDetails() }
+                buyerDetailsScreen(
+                    onBookBuyerClick = {
+                        navController.navigateToOrderDetails()
+                    }
                 )
-                wasteDetailsScreen(
+                buyersAdsScreen(
+                    navigateUp = {
+                        navController.popBackStack()
+                    },
+                    requestFineLocationPermission = requestFineLocationPermission
+                )
+                wasteTypeScreen(
+                    navigateToWasteDetails = { navController.navigateToOrderDetails() }
+                )
+                orderDetailsScreen(
                     showScheduleBottomSheet = showScheduleBottomSheet
                 )
             }
         )
         sellerExploreScreen()
         connectScreen()
-        sellerProfileScreen()
+        sellerProfileGraph(
+            nestedGraphs = {
+                sellerAccountScreen()
+            }
+        )
     }
 }
