@@ -32,7 +32,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun SellerSignInRoute(
-    onSignIn: () -> Unit,
+    navigateToHome: () -> Unit,
     signInViewModel: SignInViewModel = hiltViewModel()
 ) {
     val state by signInViewModel.state.collectAsStateWithLifecycle()
@@ -86,6 +86,10 @@ fun SellerSignInRoute(
                     ).build()
                 )
             }
+        },
+        onSignInClick = {
+            // Sign in with email and password
+            navigateToHome.invoke()
         }
     )
 }
@@ -94,6 +98,7 @@ fun SellerSignInRoute(
 fun SignInScreen(
     modifier: Modifier = Modifier,
     onGoogleSignInClick: () -> Unit,
+    onSignInClick: () -> Unit
 //    viewModel: AuthViewModel = hiltViewModel()
 ) {
     val lazyGridState = rememberLazyGridState()
@@ -169,7 +174,7 @@ fun SignInScreen(
         }
         item {
             RecircuButton(
-                onClick = onGoogleSignInClick,
+                onClick = onSignInClick,
                 label = "Sign in"
             )
         }

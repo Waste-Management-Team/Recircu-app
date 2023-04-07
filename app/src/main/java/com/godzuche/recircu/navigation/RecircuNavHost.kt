@@ -7,7 +7,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.navOptions
 import com.godzuche.recircu.RecircuBottomSheetContent
 import com.godzuche.recircu.feature.authentication.navigation.authGraph
-import com.godzuche.recircu.feature.authentication.navigation.authGraphRoute
 import com.godzuche.recircu.feature.authentication.navigation.navigateToAuth
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 
@@ -36,15 +35,13 @@ fun RecircuNavHost(
             },
             nestedGraph = {
                 sellerAuthGraph(
-                    onSignIn = {
+                    navigateToHome = {
                         val navOptions = navOptions {
-                            popUpTo(authGraphRoute) {
-                                inclusive = true
+                            popUpTo(navController.graph.startDestinationId) {
+//                                inclusive = true
                             }
                         }
-                        navController.navigate(sellerHomeRoute) {
-                            popUpTo(navController.graph.startDestinationId)
-                        }
+                        navController.navigate(sellerHomeRoute, navOptions)
                     }
                 )
             }

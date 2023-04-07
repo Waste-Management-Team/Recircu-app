@@ -19,12 +19,12 @@ object AuthModule {
     @Singleton
     fun providesFirebaseAuth() = FirebaseAuth.getInstance()
 
-    @Provides
+/*    @Provides
     @Singleton
     fun providesGoogleAuthUiClient(
         @ApplicationContext context: Context
     ) = GoogleAuthUiClient(
         context = context,
         oneTapClient = Identity.getSignInClient(context)
-    )
+    )*/
 }

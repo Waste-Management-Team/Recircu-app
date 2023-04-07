@@ -12,13 +12,13 @@ fun NavController.navigateToSellerAuth(navOptions: NavOptions? = null) {
 }
 
 fun NavGraphBuilder.sellerAuthGraph(
-    onSignIn: () -> Unit
+    navigateToHome: () -> Unit
 ) {
     navigation(
         route = sellerAuthGraphRoute,
         startDestination = sellerSignInRoute
     ) {
-        sellerSignInScreen(onSignIn = onSignIn)
+        sellerSignInScreen(navigateToHome = navigateToHome)
         sellerSignUpScreen()
     }
 }

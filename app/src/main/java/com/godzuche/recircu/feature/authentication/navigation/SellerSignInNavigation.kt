@@ -9,11 +9,11 @@ const val sellerSignInRoute = "sign_in_route"
 
 @OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.sellerSignInScreen(
-    onSignIn: () -> Unit
+    navigateToHome: () -> Unit
 ) {
     composable(
         route = sellerSignInRoute
     ) {
-        SellerSignInRoute(onSignIn = onSignIn)
+        SellerSignInRoute(navigateToHome = navigateToHome)
     }
 }
