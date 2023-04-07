@@ -1,11 +1,11 @@
 package com.godzuche.recircu.core.data.di
 
-import com.godzuche.recircu.core.location.DefaultLocationClient
 import com.godzuche.recircu.core.data.repository.AuthRepositoryImpl
 import com.godzuche.recircu.core.data.repository.OfflineFirstUserDataRepository
 import com.godzuche.recircu.core.domain.location.LocationClient
 import com.godzuche.recircu.core.domain.repository.AuthRepository
 import com.godzuche.recircu.core.domain.repository.UserDataRepository
+import com.godzuche.recircu.core.location.DefaultLocationClient
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

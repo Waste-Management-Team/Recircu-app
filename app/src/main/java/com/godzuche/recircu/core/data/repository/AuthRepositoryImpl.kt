@@ -1,6 +1,5 @@
 package com.godzuche.recircu.core.data.repository
 
-import com.godzuche.recircu.core.util.Result
 import com.godzuche.recircu.core.domain.repository.AuthRepository
 import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.AuthResult
@@ -14,33 +13,39 @@ import javax.inject.Inject
 class AuthRepositoryImpl @Inject constructor(
     private val firebaseAuth: FirebaseAuth
 ) : AuthRepository {
-    override fun loginUser(email: String, password: String): Flow<Result<AuthResult>> {
+    override fun loginUser(
+        email: String,
+        password: String
+    ): Flow<com.godzuche.recircu.core.common.Result<AuthResult>> {
         return flow {
-            emit(Result.Loading)
+            emit(com.godzuche.recircu.core.common.Result.Loading)
             val result = firebaseAuth.signInWithEmailAndPassword(email, password).await()
-            emit(Result.Success(result))
+            emit(com.godzuche.recircu.core.common.Result.Success(result))
         }.catch {
-            emit(Result.Error(it))
+            emit(com.godzuche.recircu.core.common.Result.Error(it))
         }
     }
 
-    override fun registerUser(email: String, password: String): Flow<Result<AuthResult>> {
+    override fun registerUser(
+        email: String,
+        password: String
+    ): Flow<com.godzuche.recircu.core.common.Result<AuthResult>> {
         return flow {
-            emit(Result.Loading)
+            emit(com.godzuche.recircu.core.common.Result.Loading)
             val result = firebaseAuth.createUserWithEmailAndPassword(email, password).await()
-            emit(Result.Success(result))
+            emit(com.godzuche.recircu.core.common.Result.Success(result))
         }.catch {
-            emit(Result.Error(it))
+            emit(com.godzuche.recircu.core.common.Result.Error(it))
         }
     }
 
-    override fun googleSignIn(credential: AuthCredential): Flow<Result<AuthResult>> {
+    override fun googleSignIn(credential: AuthCredential): Flow<com.godzuche.recircu.core.common.Result<AuthResult>> {
         return flow {
-            emit(Result.Loading)
+            emit(com.godzuche.recircu.core.common.Result.Loading)
             val result = firebaseAuth.signInWithCredential(credential).await()
-            emit(Result.Success(result))
+            emit(com.godzuche.recircu.core.common.Result.Success(result))
         }.catch {
-            emit(Result.Error(it))
+            emit(com.godzuche.recircu.core.common.Result.Error(it))
         }
     }
 }

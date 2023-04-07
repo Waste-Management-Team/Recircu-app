@@ -26,9 +26,9 @@ import com.godzuche.recircu.R
 import com.godzuche.recircu.core.designsystem.components.HomeTopAppBar
 import com.godzuche.recircu.core.designsystem.icon.RecircuIcon
 import com.godzuche.recircu.core.designsystem.icon.RecircuIcons
-import com.godzuche.recircu.core.ui.removeWidthConstraint
 import com.godzuche.recircu.core.designsystem.theme.RecircuTheme
 import com.godzuche.recircu.core.designsystem.theme.fontFamily
+import com.godzuche.recircu.core.ui.removeWidthConstraint
 
 @Composable
 fun SellerHomeRoute(

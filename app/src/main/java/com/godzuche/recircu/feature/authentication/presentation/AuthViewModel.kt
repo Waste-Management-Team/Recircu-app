@@ -1,9 +1,11 @@
+/*
 package com.godzuche.recircu.feature.authentication.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.godzuche.recircu.core.util.Result
 import com.godzuche.recircu.core.domain.repository.AuthRepository
+import com.godzuche.recircu.feature.authentication.presentation.SignInState
 import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.AuthResult
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -83,4 +85,4 @@ class AuthViewModel @Inject constructor(
             )
         }
     }
-}
+}*/

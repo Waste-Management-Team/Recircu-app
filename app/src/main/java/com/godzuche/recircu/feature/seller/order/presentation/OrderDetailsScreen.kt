@@ -43,8 +43,8 @@ import com.godzuche.recircu.core.designsystem.components.DetailsTextField
 import com.godzuche.recircu.core.designsystem.components.LocationTextField
 import com.godzuche.recircu.core.designsystem.components.RecircuButton
 import com.godzuche.recircu.core.designsystem.icon.RecircuIcons
-import com.godzuche.recircu.feature.google_maps.presentation.MapsViewModel
 import com.godzuche.recircu.feature.google_maps.PlacesAutocompleteResult
+import com.godzuche.recircu.feature.google_maps.presentation.MapsViewModel
 import com.google.android.gms.maps.model.LatLng
 
 @Composable
@@ -178,9 +178,9 @@ fun OrderDetailsScreen(
                 singleLine = true
             )
         }
-  /*      item {
-            Price()
-        }*/
+        /*      item {
+                  Price()
+              }*/
         item {
             ImageUpload()
         }

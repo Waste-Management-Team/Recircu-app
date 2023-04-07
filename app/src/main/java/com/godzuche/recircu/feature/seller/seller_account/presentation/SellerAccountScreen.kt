@@ -18,7 +18,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.godzuche.recircu.R
 import com.godzuche.recircu.core.designsystem.components.DetailsTextField
-import com.godzuche.recircu.feature.seller.seller_profile.ProfileImage
+import com.godzuche.recircu.feature.seller.seller_profile.presentation.ProfileImage
 
 @Composable
 fun SellerAccountRoute() {

@@ -5,8 +5,8 @@ import android.content.Context
 import android.location.Location
 import android.location.LocationManager
 import android.util.Log
-import com.godzuche.recircu.core.util.hasLocationPermission
 import com.godzuche.recircu.core.domain.location.LocationClient
+import com.godzuche.recircu.core.util.hasLocationPermission
 import com.google.android.gms.location.FusedLocationProviderClient
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow

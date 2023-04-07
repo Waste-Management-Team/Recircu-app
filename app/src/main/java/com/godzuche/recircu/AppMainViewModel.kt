@@ -4,7 +4,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.godzuche.recircu.core.domain.location.LocationClient
-import com.godzuche.recircu.core.domain.model.UserData
+import com.godzuche.recircu.core.domain.model.UserPreferenceData
 import com.godzuche.recircu.core.domain.repository.UserDataRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
@@ -18,7 +18,7 @@ class AppMainViewModel @Inject constructor(
     private val locationClient: LocationClient,
     private val userDataRepository: UserDataRepository
 ) : ViewModel() {
-    val uiState: StateFlow<MainActivityUiState> = userDataRepository.userData.map {
+    val uiState: StateFlow<MainActivityUiState> = userDataRepository.userPreferenceData.map {
         MainActivityUiState.Success(it)
     }.stateIn(
         scope = viewModelScope,
@@ -45,5 +45,5 @@ class AppMainViewModel @Inject constructor(
 
 sealed interface MainActivityUiState {
     object Loading : MainActivityUiState
-    data class Success(val userData: UserData) : MainActivityUiState
+    data class Success(val userPreferenceData: UserPreferenceData) : MainActivityUiState
 }

@@ -1,9 +1,9 @@
 package com.godzuche.recircu.core.domain.repository
 
-import com.godzuche.recircu.core.domain.model.UserData
+import com.godzuche.recircu.core.domain.model.UserPreferenceData
 import kotlinx.coroutines.flow.Flow
 
 interface UserDataRepository {
-    val userData: Flow<UserData>
+    val userPreferenceData: Flow<UserPreferenceData>
     suspend fun setIsOnboardingCompleted(isOnboardingCompleted: Boolean)
 }

@@ -7,10 +7,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.godzuche.recircu.GpsDisabledDialog
 import com.godzuche.recircu.RecircuDialog
-import com.godzuche.recircu.core.util.hasLocationPermission
+import com.godzuche.recircu.core.domain.location.LocationClient
 import com.godzuche.recircu.core.location.LocationErrorType
 import com.godzuche.recircu.core.location.LocationResult
-import com.godzuche.recircu.core.domain.location.LocationClient
+import com.godzuche.recircu.core.util.hasLocationPermission
 import com.godzuche.recircu.feature.google_maps.PlacesAutocompleteResult
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.model.Place

@@ -10,7 +10,7 @@ const val userSelectionRoute = "user_selection_route"
 @OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.userSelectionScreen(
     onSellerClick: () -> Unit
-){
+) {
     composable(
         route = userSelectionRoute,
     ) {

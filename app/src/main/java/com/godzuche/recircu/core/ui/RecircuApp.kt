@@ -31,6 +31,8 @@ import com.godzuche.recircu.core.designsystem.components.RecircuNavigationDefaul
 import com.godzuche.recircu.core.designsystem.components.RecircuNavigationItem
 import com.godzuche.recircu.core.designsystem.components.RecircuTopBar
 import com.godzuche.recircu.core.designsystem.icon.RecircuIcon
+import com.godzuche.recircu.core.ui.RecircuAppState
+import com.godzuche.recircu.core.ui.rememberRecircuAppState
 import com.godzuche.recircu.feature.google_maps.presentation.MapsRoute
 import com.godzuche.recircu.feature.google_maps.presentation.MapsViewModel
 import com.godzuche.recircu.feature.seller.schedule.ScheduleBottomSheetContent
@@ -261,6 +263,9 @@ fun NavDestination?.isBottomBarDestinationInHierarchy(bottomBarDestination: Reci
 @Composable
 fun AppPreview() {
     MaterialTheme {
-        RecircuApp(onDisplayEdgeToEdgeImmersive = {}, openLocationSettings = {}, requestFineLocationPermission = {})
+        RecircuApp(
+            onDisplayEdgeToEdgeImmersive = {},
+            openLocationSettings = {},
+            requestFineLocationPermission = {})
     }
 }

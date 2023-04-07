@@ -5,7 +5,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
-import com.godzuche.recircu.core.domain.model.UserData
+import com.godzuche.recircu.core.domain.model.UserPreferenceData
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import java.io.IOException
@@ -14,14 +14,14 @@ import javax.inject.Inject
 class RecircuPrefencesDataSource @Inject constructor(
     private val userPreferences: DataStore<Preferences>
 ) {
-    val getUserData = userPreferences.data
+    val getUserPreferenceData = userPreferences.data
         .catch {
             if (it is IOException) {
                 it.printStackTrace()
                 emit(emptyPreferences())
             } else throw it
         }.map {
-            UserData(
+            UserPreferenceData(
                 isOnboardingCompleted = it[IS_ONBOARDING_COMPLETED] ?: false
             )
         }

@@ -5,7 +5,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.navigation
-import com.godzuche.recircu.feature.seller.seller_profile.SellerProfileRoute
+import com.godzuche.recircu.feature.seller.seller_profile.presentation.SellerProfileRoute
 import com.google.accompanist.navigation.animation.composable
 
 
