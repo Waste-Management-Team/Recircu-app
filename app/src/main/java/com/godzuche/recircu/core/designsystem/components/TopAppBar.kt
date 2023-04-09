@@ -61,7 +61,7 @@ fun HomeTopAppBar(
                 is UserState.Success -> {
                     Column {
                         Text(
-                            text = "Hi ${userState.user.lastName}!",
+                            text = "Hi ${userState.user.name}!",
                             style = MaterialTheme.typography.titleSmall,
                             modifier = Modifier.paddingFromBaseline(bottom = 14.dp)
                         )

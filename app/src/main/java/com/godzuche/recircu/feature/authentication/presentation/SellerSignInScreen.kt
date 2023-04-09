@@ -27,7 +27,10 @@ import com.godzuche.recircu.core.designsystem.components.AuthTextButton
 import com.godzuche.recircu.core.designsystem.components.GoogleSignInButton
 import com.godzuche.recircu.core.designsystem.components.RecircuButton
 import com.godzuche.recircu.core.firebase.GoogleAuthUiClient
+import com.godzuche.recircu.core.firebase.OneTapSignInRespose
 import com.google.android.gms.auth.api.identity.Identity
+import com.google.android.gms.common.api.ApiException
+import com.google.android.gms.common.api.CommonStatusCodes
 import kotlinx.coroutines.launch
 
 @Composable
@@ -73,13 +76,25 @@ fun SellerSignInRoute(
                 "Sign in successful!",
                 Toast.LENGTH_LONG
             ).show()
+            navigateToHome.invoke()
         }
     }
 
     SignInScreen(
         onGoogleSignInClick = {
             coroutineScope.launch {
-                val signInIntentSender = googleAuthUiClient.signIn()
+                val signInIntentSender =
+                    when (val oneTapSignInRespose = googleAuthUiClient.signIn()) {
+                        is OneTapSignInRespose.Success -> oneTapSignInRespose.data
+                        is OneTapSignInRespose.Failure -> {
+                            Toast.makeText(
+                                context,
+                                getOneTapAuthErrorText(oneTapSignInRespose.e),
+                                Toast.LENGTH_LONG
+                            ).show()
+                            null
+                        }
+                    }
                 googleSignLauncher.launch(
                     IntentSenderRequest.Builder(
                         signInIntentSender ?: return@launch
@@ -92,6 +107,16 @@ fun SellerSignInRoute(
             navigateToHome.invoke()
         }
     )
+}
+
+fun getOneTapAuthErrorText(e: Exception): String {
+    return if (e is ApiException) {
+        when (e.status.statusCode) {
+            CommonStatusCodes.NETWORK_ERROR -> "Network Error: Please check your internet connection"
+            CommonStatusCodes.INTERNAL_ERROR -> "Oops! An error occurred! Please check internet connection"
+            else -> e.message ?: "Oops! An error occurred!"
+        }
+    } else e.message ?: "Oops! An error occurred!"
 }
 
 @Composable
@@ -211,15 +236,6 @@ fun SignInScreen(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = {
                     onGoogleSignInClick.invoke()
-                    /*val gso = GoogleSignInOptions.Builder(
-                        GoogleSignInOptions.DEFAULT_SIGN_IN
-                    )
-                        .requestEmail()
-                        .requestIdToken(BuildConfig.CLIENT_ID)
-                        .build()
-
-                    val googleSignInClient = GoogleSignIn.getClient(context, gso)
-                    googleSignInLauncher.launch(googleSignInClient.signInIntent)*/
                 }
             )
         }
@@ -236,28 +252,4 @@ fun SignInScreen(
             )
         }
     }
-    /*    val googleSignInLauncher =
-        rememberLauncherForActivityResult(
-            contract = ActivityResultContracts.StartActivityForResult()
-        ) {
-            val account = GoogleSignIn.getSignedInAccountFromIntent(it.data)
-            try {
-                val result = account.getResult(ApiException::class.java)
-                val credentials = GoogleAuthProvider.getCredential(result.idToken, null)
-                viewModel.googleSignIn(credentials)
-            } catch (it: ApiException) {
-                print(it)
-            }
-        }*/
-//    val googleSignInState by viewModel.googleSignInState.collectAsStateWithLifecycle()
-/*    val scope = rememberCoroutineScope()
-    LaunchedEffect(key1 = googleSignInState) {
-        scope.launch {
-            if (googleSignInState.success != null) {
-                Toast.makeText(context, "Sign in success", Toast.LENGTH_LONG).show()
-                onSignIn.invoke()
-                viewModel.setGoogleSignInState(null)
-            }
-        }
-    }*/
 }

@@ -2,17 +2,18 @@ package com.godzuche.recircu.feature.seller.seller_dashboard.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.godzuche.recircu.feature.authentication.presentation.UserData
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class SellerHomeViewModel @Inject constructor() : ViewModel() {
-    val user = User(
-        firstName = "God'swill",
-        lastName = "Jonathan",
+    private val sampleUser = User(
+        name = "God'swill",
+        photo = null,
+        email = null,
         location = "Rivers State University"
     )
     val buyerAds = listOf(
@@ -63,13 +64,18 @@ class SellerHomeViewModel @Inject constructor() : ViewModel() {
                 isLoading = false
             )
         }
-        viewModelScope.launch {
-            delay(2000)
-            _userState.update {
-                UserState.Success(
-                    user = user
+    }
+
+    fun onGetCurrentUser(userData: UserData?) {
+        _userState.update {
+            UserState.Success(
+                User(
+                    name = userData?.displayName ?: "No name",
+                    photo = userData?.profilePictureUrl,
+                    email = userData?.email,
+                    location = sampleUser.location
                 )
-            }
+            )
         }
     }
 
@@ -109,8 +115,9 @@ sealed interface UserState {
 }
 
 data class User(
-    val firstName: String,
-    val lastName: String,
+    val name: String,
+    val email: String?,
+    val photo: String?,
     val location: String
 )
 

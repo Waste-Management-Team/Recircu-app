@@ -14,6 +14,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -28,7 +29,9 @@ import com.godzuche.recircu.core.designsystem.icon.RecircuIcon
 import com.godzuche.recircu.core.designsystem.icon.RecircuIcons
 import com.godzuche.recircu.core.designsystem.theme.RecircuTheme
 import com.godzuche.recircu.core.designsystem.theme.fontFamily
+import com.godzuche.recircu.core.firebase.GoogleAuthUiClient
 import com.godzuche.recircu.core.ui.removeWidthConstraint
+import com.google.android.gms.auth.api.identity.Identity
 
 @Composable
 fun SellerHomeRoute(
@@ -39,6 +42,15 @@ fun SellerHomeRoute(
 ) {
     val userState by viewModel.userState.collectAsStateWithLifecycle()
     val state by viewModel.state.collectAsStateWithLifecycle()
+
+    val context = LocalContext.current
+    val googleAuthUiClient = GoogleAuthUiClient(
+        context = context,
+        oneTapClient = Identity.getSignInClient(context)
+    )
+
+    viewModel.onGetCurrentUser(googleAuthUiClient.getSignedInUser())
+
     SellerHomeScreen(
         userState = userState,
         uiState = state,
@@ -241,7 +253,7 @@ sealed class WasteType(
 fun HomePreview() {
     RecircuTheme {
         SellerHomeScreen(uiState = SellerHomeUiState(),
-            userState = UserState.Success(user = User("", "Jonah", "")),
+            userState = UserState.Success(user = User("God'swill", "", "", "")),
             filterBuyersAds = { a, b -> },
             navigateToBuyer = {},
             navigateToBuyersAds = {}

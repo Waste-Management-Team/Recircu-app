@@ -34,30 +34,48 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import coil.size.Size
 import com.godzuche.recircu.core.designsystem.components.RecircuAnimatedCircle
 import com.godzuche.recircu.core.designsystem.icon.RecircuIcons
 import com.godzuche.recircu.core.designsystem.theme.fontFamily
+import com.godzuche.recircu.core.firebase.GoogleAuthUiClient
 import com.godzuche.recircu.feature.seller.seller_dashboard.presentation.HomeSection
+import com.godzuche.recircu.feature.seller.seller_dashboard.presentation.User
+import com.godzuche.recircu.feature.seller.seller_dashboard.presentation.UserState
 import com.godzuche.recircu.feature.seller.seller_dashboard.presentation.WasteType
+import com.google.android.gms.auth.api.identity.Identity
 
 @Composable
-fun SellerProfileRoute(modifier: Modifier = Modifier) {
+fun SellerProfileRoute(
+    modifier: Modifier = Modifier,
+    viewModel: SellerProfileViewModel = hiltViewModel()
+) {
+    val userState by viewModel.userState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+    val googleAuthUiClient = GoogleAuthUiClient(
+        context = context,
+        oneTapClient = Identity.getSignInClient(context)
+    )
+
+    viewModel.onGetCurrentUser(googleAuthUiClient.getSignedInUser())
+
     SellerProfileScreen(
-        modifier = modifier
+        modifier = modifier,
+        userState = userState
     )
 }
 
 @OptIn(ExperimentalLayoutApi::class)
-@Preview(showBackground = true)
 @Composable
 fun SellerProfileScreen(
+    userState: UserState,
     modifier: Modifier = Modifier
 ) {
     val lazyGridState = rememberLazyGridState()
@@ -74,7 +92,14 @@ fun SellerProfileScreen(
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
         item(span = { GridItemSpan(maxLineSpan) }) {
-            ProfileHeader()
+            when (userState) {
+                is UserState.Loading -> {}
+                is UserState.Success -> {
+                    ProfileHeader(
+                        user = userState.user
+                    )
+                }
+            }
         }
         item(span = { GridItemSpan(maxLineSpan) }) {
             TextButton(
@@ -490,16 +515,21 @@ fun Balance() {
 }
 
 @Composable
-fun ProfileHeader(modifier: Modifier = Modifier) {
+fun ProfileHeader(
+    modifier: Modifier = Modifier,
+    user: User
+) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
     ) {
-        ProfileImage()
+        ProfileImage(
+            photo = user.photo
+        )
         Spacer(modifier = Modifier.height(16.dp))
         CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
             Text(
-                text = "God'swill Jonathan",
+                text = user.name,
                 style = MaterialTheme.typography.titleLarge,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
@@ -507,12 +537,14 @@ fun ProfileHeader(modifier: Modifier = Modifier) {
         }
         Spacer(modifier = Modifier.height(4.dp))
         CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-            Text(
-                text = "godswill.jonathan@ust.edu.ng",
-                style = MaterialTheme.typography.titleSmall,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
+            user.email?.let {
+                Text(
+                    text = it,
+                    style = MaterialTheme.typography.titleSmall,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
         }
         Spacer(modifier = Modifier.height(4.dp))
         Row(
@@ -539,7 +571,10 @@ fun ProfileHeader(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun ProfileImage(modifier: Modifier = Modifier) {
+fun ProfileImage(
+    modifier: Modifier = Modifier,
+    photo: String?
+) {
     var imageUri by remember {
         mutableStateOf<Uri?>(null)
     }
@@ -561,7 +596,7 @@ fun ProfileImage(modifier: Modifier = Modifier) {
             .crossfade(true)
             .build()
         AsyncImage(
-            model = imageRequest,
+            model = photo ?: imageRequest,
             placeholder = painterResource(id = com.godzuche.recircu.R.drawable.ic_launcher_foreground),
             contentDescription = "Profile picture",
             contentScale = ContentScale.Crop,
