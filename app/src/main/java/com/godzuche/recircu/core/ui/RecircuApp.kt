@@ -48,7 +48,8 @@ fun RecircuApp(
     openLocationSettings: () -> Unit,
     requestFineLocationPermission: () -> Unit,
     appState: RecircuAppState = rememberRecircuAppState(),
-    mapsViewModel: MapsViewModel = hiltViewModel()
+    mapsViewModel: MapsViewModel = hiltViewModel(),
+    startDestination: String
 ) {
     appState.shouldDisplayEdgeToEdge?.let { onDisplayEdgeToEdgeImmersive.invoke(it) }
 
@@ -185,6 +186,7 @@ fun RecircuApp(
 
             ) {
                 RecircuNavHost(
+                    startDestination = startDestination,
                     navController = appState.navController,
                     showScheduleBottomSheet = { sheetContent ->
                         bottomSheetContent = sheetContent
@@ -266,6 +268,8 @@ fun AppPreview() {
         RecircuApp(
             onDisplayEdgeToEdgeImmersive = {},
             openLocationSettings = {},
-            requestFineLocationPermission = {})
+            requestFineLocationPermission = {},
+            startDestination = gettingStartedRoute
+        )
     }
 }

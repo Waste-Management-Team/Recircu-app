@@ -28,13 +28,18 @@ import com.godzuche.recircu.core.designsystem.components.FineLocationPermissionT
 import com.godzuche.recircu.core.designsystem.components.PermissionDialog
 import com.godzuche.recircu.core.designsystem.theme.RecircuTheme
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    @Inject
+    lateinit var auth: FirebaseAuth
+
     private val viewModel: AppMainViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
@@ -67,9 +72,6 @@ class MainActivity : ComponentActivity() {
         setContent {
             val systemUiController = rememberSystemUiController()
             val useDarkIcons = !isSystemInDarkTheme()
-            /*var shouldShowEdgeToEdge by remember {
-                mutableStateOf(true)
-            }*/
 
             RecircuTheme {
                 val dialogQueue = viewModel.visiblePermissionDialogQueue
@@ -83,49 +85,53 @@ class MainActivity : ComponentActivity() {
                         )
                     }
                 }
-                RecircuApp(
-                    openLocationSettings = ::openLocationSettings,
-                    requestFineLocationPermission = {
-                        Log.d("Location", "reqPerms")
-                        // request permissions yet to be granted
-                        multiplePermissionsResultLauncher.launch(
-                            arrayOf(
-                                Manifest.permission.ACCESS_FINE_LOCATION
+                if (uiState is MainActivityUiState.Success) {
+                    RecircuApp(
+                        startDestination = (uiState as MainActivityUiState.Success)
+                            .getStartDestination(auth),
+                        openLocationSettings = ::openLocationSettings,
+                        requestFineLocationPermission = {
+                            Log.d("Location", "reqPerms")
+                            // request permissions yet to be granted
+                            multiplePermissionsResultLauncher.launch(
+                                arrayOf(
+                                    Manifest.permission.ACCESS_FINE_LOCATION
+                                )
                             )
-                        )
-                    },
-                    onDisplayEdgeToEdgeImmersive = { shouldDisplayEdgeToEdge ->
-                        DisposableEffect(
-                            systemUiController,
-                            useDarkIcons,
-                            shouldDisplayEdgeToEdge
-                        ) {
-                            if (shouldDisplayEdgeToEdge) {
-                                systemUiController.isStatusBarVisible = false
-                                systemUiController.systemBarsBehavior =
-                                    WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+                        },
+                        onDisplayEdgeToEdgeImmersive = { shouldDisplayEdgeToEdge ->
+                            DisposableEffect(
+                                systemUiController,
+                                useDarkIcons,
+                                shouldDisplayEdgeToEdge
+                            ) {
+                                if (shouldDisplayEdgeToEdge) {
+                                    systemUiController.isStatusBarVisible = false
+                                    systemUiController.systemBarsBehavior =
+                                        WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
 
-                                systemUiController.setSystemBarsColor(
-                                    color = Color.Transparent,
-                                    darkIcons = useDarkIcons
-                                )
-                                systemUiController.systemBarsDarkContentEnabled = useDarkIcons
-                                onDispose { }
-                            } else {
-                                systemUiController.isStatusBarVisible = true
-                                systemUiController.systemBarsBehavior =
-                                    WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+                                    systemUiController.setSystemBarsColor(
+                                        color = Color.Transparent,
+                                        darkIcons = useDarkIcons
+                                    )
+                                    systemUiController.systemBarsDarkContentEnabled = useDarkIcons
+                                    onDispose { }
+                                } else {
+                                    systemUiController.isStatusBarVisible = true
+                                    systemUiController.systemBarsBehavior =
+                                        WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
 
-                                systemUiController.setSystemBarsColor(
-                                    color = Color.Transparent,
-                                    darkIcons = useDarkIcons
-                                )
-                                systemUiController.systemBarsDarkContentEnabled = useDarkIcons
-                                onDispose {}
+                                    systemUiController.setSystemBarsColor(
+                                        color = Color.Transparent,
+                                        darkIcons = useDarkIcons
+                                    )
+                                    systemUiController.systemBarsDarkContentEnabled = useDarkIcons
+                                    onDispose {}
+                                }
                             }
                         }
-                    }
-                )
+                    )
+                }
                 dialogQueue
                     .reversed()
                     .forEach { permission ->
@@ -139,9 +145,9 @@ class MainActivity : ComponentActivity() {
                             isPermanentlyDeclined = !shouldShowRequestPermissionRationale(
                                 permission
                             ),
-                            onDismiss = viewModel::dismissDialog,
+                            onDismiss = viewModel::dismissPermissionDialog,
                             onOkClicked = {
-                                viewModel.dismissDialog()
+                                viewModel.dismissPermissionDialog()
                                 multiplePermissionsResultLauncher.launch(
                                     arrayOf(permission)
                                 )

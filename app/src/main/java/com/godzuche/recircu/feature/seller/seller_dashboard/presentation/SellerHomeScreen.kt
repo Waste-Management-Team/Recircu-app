@@ -29,9 +29,11 @@ import com.godzuche.recircu.core.designsystem.icon.RecircuIcon
 import com.godzuche.recircu.core.designsystem.icon.RecircuIcons
 import com.godzuche.recircu.core.designsystem.theme.RecircuTheme
 import com.godzuche.recircu.core.designsystem.theme.fontFamily
-import com.godzuche.recircu.core.firebase.GoogleAuthUiClient
+import com.godzuche.recircu.core.firebase.GoogleAuthUiClientImpl
 import com.godzuche.recircu.core.ui.removeWidthConstraint
 import com.google.android.gms.auth.api.identity.Identity
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 
 @Composable
 fun SellerHomeRoute(
@@ -44,12 +46,13 @@ fun SellerHomeRoute(
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     val context = LocalContext.current
-    val googleAuthUiClient = GoogleAuthUiClient(
+    val googleAuthUiClientImpl = GoogleAuthUiClientImpl(
         context = context,
+        auth = Firebase.auth,
         oneTapClient = Identity.getSignInClient(context)
     )
 
-    viewModel.onGetCurrentUser(googleAuthUiClient.getSignedInUser())
+    viewModel.onGetCurrentUser(googleAuthUiClientImpl.getSignedInUser())
 
     SellerHomeScreen(
         userState = userState,

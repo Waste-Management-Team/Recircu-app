@@ -19,9 +19,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.godzuche.recircu.R
 import com.godzuche.recircu.core.designsystem.components.DetailsTextField
-import com.godzuche.recircu.core.firebase.GoogleAuthUiClient
+import com.godzuche.recircu.core.firebase.GoogleAuthUiClientImpl
 import com.godzuche.recircu.feature.seller.seller_profile.presentation.ProfileImage
 import com.google.android.gms.auth.api.identity.Identity
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 
 @Composable
 fun SellerAccountRoute() {
@@ -37,9 +39,10 @@ fun SellerAccountScreen(
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
 
     val context = LocalContext.current
-    val googleAuthUiClient = GoogleAuthUiClient(
+    val googleAuthUiClientImpl = GoogleAuthUiClientImpl(
         context = context,
-        oneTapClient = Identity.getSignInClient(context)
+        oneTapClient = Identity.getSignInClient(context),
+        auth = Firebase.auth
     )
 
     LazyVerticalGrid(
@@ -53,7 +56,7 @@ fun SellerAccountScreen(
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
         item(span = { GridItemSpan(maxLineSpan) }) {
-            ProfileImage(photo = googleAuthUiClient.getSignedInUser()?.profilePictureUrl)
+            ProfileImage(photo = googleAuthUiClientImpl.getSignedInUser()?.profilePictureUrl)
         }
         item(span = { GridItemSpan(maxLineSpan) }) {
             DetailsTextField(

@@ -1,9 +1,9 @@
 package com.godzuche.recircu.core.firebase.di
 
 import android.content.Context
-import com.godzuche.recircu.core.firebase.GoogleAuthUiClient
 import com.google.android.gms.auth.api.identity.Identity
-import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -17,14 +17,11 @@ object AuthModule {
 
     @Provides
     @Singleton
-    fun providesFirebaseAuth() = FirebaseAuth.getInstance()
+    fun providesFirebaseAuth() = Firebase.auth
 
-/*    @Provides
+    @Provides
     @Singleton
-    fun providesGoogleAuthUiClient(
+    fun providesOneTapClient(
         @ApplicationContext context: Context
-    ) = GoogleAuthUiClient(
-        context = context,
-        oneTapClient = Identity.getSignInClient(context)
-    )*/
+    ) = Identity.getSignInClient(context)
 }

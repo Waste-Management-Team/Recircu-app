@@ -3,19 +3,24 @@ package com.godzuche.recircu
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.godzuche.recircu.core.domain.location.LocationClient
 import com.godzuche.recircu.core.domain.model.UserPreferenceData
 import com.godzuche.recircu.core.domain.repository.UserDataRepository
+import com.godzuche.recircu.feature.authentication.navigation.authGraphRoute
+import com.godzuche.recircu.navigation.gettingStartedRoute
+import com.godzuche.recircu.navigation.sellerHomeGraphRoute
+import com.godzuche.recircu.navigation.sellerHomeRoute
+import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class AppMainViewModel @Inject constructor(
-    private val locationClient: LocationClient,
     private val userDataRepository: UserDataRepository
 ) : ViewModel() {
     val uiState: StateFlow<MainActivityUiState> = userDataRepository.userPreferenceData.map {
@@ -28,7 +33,13 @@ class AppMainViewModel @Inject constructor(
 
     val visiblePermissionDialogQueue = mutableStateListOf<String>()
 
-    fun dismissDialog() {
+    fun saveOnboardingState(isCompleted: Boolean) {
+        viewModelScope.launch(Dispatchers.IO) {
+            userDataRepository.setIsOnboardingCompleted(isOnboardingCompleted = isCompleted)
+        }
+    }
+
+    fun dismissPermissionDialog() {
         visiblePermissionDialogQueue.removeFirst()
     }
 
@@ -45,5 +56,16 @@ class AppMainViewModel @Inject constructor(
 
 sealed interface MainActivityUiState {
     object Loading : MainActivityUiState
-    data class Success(val userPreferenceData: UserPreferenceData) : MainActivityUiState
+    data class Success(
+        val userPreferenceData: UserPreferenceData,
+    ) : MainActivityUiState {
+        fun getStartDestination(auth: FirebaseAuth): String {
+            val isUserSignedIn = auth.currentUser != null
+            return when {
+                userPreferenceData.isOnboardingCompleted && isUserSignedIn -> sellerHomeGraphRoute
+                userPreferenceData.isOnboardingCompleted && !isUserSignedIn -> authGraphRoute
+                else -> gettingStartedRoute
+            }
+        }
+    }
 }

@@ -26,11 +26,13 @@ import com.godzuche.recircu.R
 import com.godzuche.recircu.core.designsystem.components.AuthTextButton
 import com.godzuche.recircu.core.designsystem.components.GoogleSignInButton
 import com.godzuche.recircu.core.designsystem.components.RecircuButton
-import com.godzuche.recircu.core.firebase.GoogleAuthUiClient
+import com.godzuche.recircu.core.firebase.GoogleAuthUiClientImpl
 import com.godzuche.recircu.core.firebase.OneTapSignInRespose
 import com.google.android.gms.auth.api.identity.Identity
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.common.api.CommonStatusCodes
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
 
 @Composable
@@ -41,8 +43,9 @@ fun SellerSignInRoute(
     val state by signInViewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
-    val googleAuthUiClient = GoogleAuthUiClient(
+    val googleAuthUiClient = GoogleAuthUiClientImpl(
         context = context,
+        auth = Firebase.auth,
         oneTapClient = Identity.getSignInClient(context)
     )
 

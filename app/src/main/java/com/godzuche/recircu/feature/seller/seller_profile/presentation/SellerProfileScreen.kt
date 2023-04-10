@@ -45,12 +45,14 @@ import coil.size.Size
 import com.godzuche.recircu.core.designsystem.components.RecircuAnimatedCircle
 import com.godzuche.recircu.core.designsystem.icon.RecircuIcons
 import com.godzuche.recircu.core.designsystem.theme.fontFamily
-import com.godzuche.recircu.core.firebase.GoogleAuthUiClient
+import com.godzuche.recircu.core.firebase.GoogleAuthUiClientImpl
 import com.godzuche.recircu.feature.seller.seller_dashboard.presentation.HomeSection
 import com.godzuche.recircu.feature.seller.seller_dashboard.presentation.User
 import com.godzuche.recircu.feature.seller.seller_dashboard.presentation.UserState
 import com.godzuche.recircu.feature.seller.seller_dashboard.presentation.WasteType
 import com.google.android.gms.auth.api.identity.Identity
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 
 @Composable
 fun SellerProfileRoute(
@@ -59,8 +61,9 @@ fun SellerProfileRoute(
 ) {
     val userState by viewModel.userState.collectAsStateWithLifecycle()
     val context = LocalContext.current
-    val googleAuthUiClient = GoogleAuthUiClient(
+    val googleAuthUiClient = GoogleAuthUiClientImpl(
         context = context,
+        auth = Firebase.auth,
         oneTapClient = Identity.getSignInClient(context)
     )
 

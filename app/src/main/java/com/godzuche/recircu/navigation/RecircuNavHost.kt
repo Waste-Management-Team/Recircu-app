@@ -3,8 +3,10 @@ package com.godzuche.recircu.navigation
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.navOptions
+import com.godzuche.recircu.AppMainViewModel
 import com.godzuche.recircu.RecircuBottomSheetContent
 import com.godzuche.recircu.feature.authentication.navigation.authGraph
 import com.godzuche.recircu.feature.authentication.navigation.navigateToAuth
@@ -17,15 +19,16 @@ fun RecircuNavHost(
     showScheduleBottomSheet: (RecircuBottomSheetContent) -> Unit,
     requestFineLocationPermission: () -> Unit,
     modifier: Modifier = Modifier,
-    startDestination: String = gettingStartedRoute
+    startDestination: String = sellerAuthGraphRoute,
+    appMainViewModel: AppMainViewModel = hiltViewModel()
 ) {
     AnimatedNavHost(
         navController = navController,
         startDestination = startDestination
     ) {
         gettingStartedScreen(
-//            navigateToDashboard = { navController.navigate(sellerHomeRoute) }
             navigateToAuthentication = {
+                appMainViewModel.saveOnboardingState(isCompleted = true)
                 navController.navigateToAuth()
             }
         )
@@ -38,7 +41,7 @@ fun RecircuNavHost(
                     navigateToHome = {
                         val navOptions = navOptions {
                             popUpTo(navController.graph.startDestinationId) {
-//                                inclusive = true
+                                inclusive = true
                             }
                         }
                         navController.navigate(sellerHomeRoute, navOptions)

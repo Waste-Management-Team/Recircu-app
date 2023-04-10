@@ -1,9 +1,9 @@
 package com.godzuche.recircu.feature.google_maps.presentation
 
-import android.content.Context
+import android.app.Application
 import android.location.Location
 import android.util.Log
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.godzuche.recircu.GpsDisabledDialog
 import com.godzuche.recircu.RecircuDialog
@@ -28,8 +28,8 @@ import javax.inject.Inject
 class MapsViewModel @Inject constructor(
     private val locationClient: LocationClient,
     private val placesClient: PlacesClient,
-    private val context: Context
-) : ViewModel() {
+    private val app: Application
+) : AndroidViewModel(app) {
     private val _lastLocation: MutableStateFlow<Location?> = MutableStateFlow(null)
     val lastLocation: StateFlow<Location?> get() = _lastLocation.asStateFlow()
 
@@ -109,7 +109,7 @@ class MapsViewModel @Inject constructor(
     fun getLastLocation() {
         _state.update {
             it.copy(
-                isLocationPermissionEnabled = context.hasLocationPermission()
+                isLocationPermissionEnabled = app.applicationContext.hasLocationPermission()
             )
         }
         viewModelScope.launch(Dispatchers.IO) {
