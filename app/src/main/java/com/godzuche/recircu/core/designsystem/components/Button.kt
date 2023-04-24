@@ -3,7 +3,6 @@ package com.godzuche.recircu.core.designsystem.components
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable

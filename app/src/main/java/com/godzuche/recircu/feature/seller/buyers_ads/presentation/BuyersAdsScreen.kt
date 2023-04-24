@@ -17,11 +17,13 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.godzuche.recircu.AppMainViewModel
 import com.godzuche.recircu.feature.google_maps.presentation.MapsRoute
 import com.godzuche.recircu.feature.google_maps.presentation.MapsViewModel
 
 @Composable
 fun BuyersAdsRoute(
+    appMainViewModel: AppMainViewModel,
     requestFineLocationPermission: () -> Unit,
     navigateUp: () -> Unit,
     mapsViewModel: MapsViewModel = hiltViewModel()
@@ -37,7 +39,8 @@ fun BuyersAdsRoute(
         toggleMapView = {
             if (it) {
                 Log.d("Location", "toggle map view")
-                mapsViewModel.getLastLocation()
+//                mapsViewModel.getLastLocation()
+                appMainViewModel.getLastLocation()
             } else Unit
         }
     )

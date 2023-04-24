@@ -27,6 +27,8 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.godzuche.recircu.core.designsystem.components.FineLocationPermissionTextProvider
 import com.godzuche.recircu.core.designsystem.components.PermissionDialog
 import com.godzuche.recircu.core.designsystem.theme.RecircuTheme
+import com.godzuche.recircu.core.firebase.GoogleAuthUiClient
+import com.godzuche.recircu.core.ui.RecircuApp
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
@@ -40,7 +42,10 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var auth: FirebaseAuth
 
-    private val viewModel: AppMainViewModel by viewModels()
+    @Inject
+    lateinit var googleAuthUiClient: GoogleAuthUiClient
+
+    private val appMainViewModel: AppMainViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
@@ -49,7 +54,7 @@ class MainActivity : ComponentActivity() {
 
         lifecycleScope.launch {
             lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.uiState
+                appMainViewModel.uiState
                     .onEach {
                         uiState = it
                     }.collect()
@@ -74,31 +79,29 @@ class MainActivity : ComponentActivity() {
             val useDarkIcons = !isSystemInDarkTheme()
 
             RecircuTheme {
-                val dialogQueue = viewModel.visiblePermissionDialogQueue
+                val permissionDialogQueue = appMainViewModel.visiblePermissionDialogQueue
                 val multiplePermissionsResultLauncher = rememberLauncherForActivityResult(
                     contract = ActivityResultContracts.RequestMultiplePermissions()
                 ) { perms ->
                     perms.keys.forEach { permission ->
-                        viewModel.onPermissionResult(
+                        appMainViewModel.onPermissionResult(
                             permission = permission,
                             isGranted = perms[permission] == true
                         )
                     }
                 }
                 if (uiState is MainActivityUiState.Success) {
+                    if (!(uiState as MainActivityUiState.Success).isLocationPermissionGranted) {
+                        multiplePermissionsResultLauncher.launch(
+                            arrayOf(
+                                Manifest.permission.ACCESS_FINE_LOCATION
+                            )
+                        )
+                    }
                     RecircuApp(
+                        appMainViewModel = appMainViewModel,
                         startDestination = (uiState as MainActivityUiState.Success)
                             .getStartDestination(auth),
-                        openLocationSettings = ::openLocationSettings,
-                        requestFineLocationPermission = {
-                            Log.d("Location", "reqPerms")
-                            // request permissions yet to be granted
-                            multiplePermissionsResultLauncher.launch(
-                                arrayOf(
-                                    Manifest.permission.ACCESS_FINE_LOCATION
-                                )
-                            )
-                        },
                         onDisplayEdgeToEdgeImmersive = { shouldDisplayEdgeToEdge ->
                             DisposableEffect(
                                 systemUiController,
@@ -129,10 +132,21 @@ class MainActivity : ComponentActivity() {
                                     onDispose {}
                                 }
                             }
-                        }
+                        },
+                        openLocationSettings = ::openLocationSettings,
+                        requestFineLocationPermission = {
+                            Log.d("Location", "reqPerms")
+                            /*// request permissions yet to be granted
+                            multiplePermissionsResultLauncher.launch(
+                                arrayOf(
+                                    Manifest.permission.ACCESS_FINE_LOCATION
+                                )
+                            )*/
+                        },
+                        googleAuthUiClient = googleAuthUiClient
                     )
                 }
-                dialogQueue
+                permissionDialogQueue
                     .reversed()
                     .forEach { permission ->
                         PermissionDialog(
@@ -145,9 +159,9 @@ class MainActivity : ComponentActivity() {
                             isPermanentlyDeclined = !shouldShowRequestPermissionRationale(
                                 permission
                             ),
-                            onDismiss = viewModel::dismissPermissionDialog,
+                            onDismiss = appMainViewModel::dismissPermissionDialog,
                             onOkClicked = {
-                                viewModel.dismissPermissionDialog()
+                                appMainViewModel.dismissPermissionDialog()
                                 multiplePermissionsResultLauncher.launch(
                                     arrayOf(permission)
                                 )

@@ -90,7 +90,7 @@ fun RecircuDialog(
             }
         },
         text = {
-            recircuDialog.text?.let {
+            recircuDialog.description?.let {
                 Text(
                     text = it
                 )

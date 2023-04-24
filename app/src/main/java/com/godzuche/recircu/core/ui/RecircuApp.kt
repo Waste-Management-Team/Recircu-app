@@ -1,6 +1,7 @@
-package com.godzuche.recircu
+package com.godzuche.recircu.core.ui
 
-import android.util.Log
+import android.content.Context
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
@@ -14,27 +15,27 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.navOptions
+import com.godzuche.recircu.*
 import com.godzuche.recircu.core.designsystem.components.RecircuDialog
 import com.godzuche.recircu.core.designsystem.components.RecircuNavigationDefaults
 import com.godzuche.recircu.core.designsystem.components.RecircuNavigationItem
 import com.godzuche.recircu.core.designsystem.components.RecircuTopBar
 import com.godzuche.recircu.core.designsystem.icon.RecircuIcon
-import com.godzuche.recircu.core.ui.RecircuAppState
-import com.godzuche.recircu.core.ui.rememberRecircuAppState
+import com.godzuche.recircu.core.firebase.AuthResult
+import com.godzuche.recircu.core.firebase.GoogleAuthUiClient
+import com.godzuche.recircu.feature.authentication.navigation.navigateToAuth
 import com.godzuche.recircu.feature.google_maps.presentation.MapsRoute
-import com.godzuche.recircu.feature.google_maps.presentation.MapsViewModel
 import com.godzuche.recircu.feature.seller.schedule.ScheduleBottomSheetContent
 import com.godzuche.recircu.navigation.*
 import kotlinx.coroutines.launch
@@ -44,13 +45,15 @@ import kotlinx.coroutines.launch
 )
 @Composable
 fun RecircuApp(
+    appMainViewModel: AppMainViewModel,
     onDisplayEdgeToEdgeImmersive: @Composable (Boolean) -> Unit,
     openLocationSettings: () -> Unit,
     requestFineLocationPermission: () -> Unit,
-    appState: RecircuAppState = rememberRecircuAppState(),
-    mapsViewModel: MapsViewModel = hiltViewModel(),
-    startDestination: String
+    startDestination: String,
+    googleAuthUiClient: GoogleAuthUiClient,
+    appState: RecircuAppState = rememberRecircuAppState()
 ) {
+    val context = LocalContext.current
     appState.shouldDisplayEdgeToEdge?.let { onDisplayEdgeToEdgeImmersive.invoke(it) }
 
     val coroutineScope = appState.coroutineScope
@@ -64,24 +67,37 @@ fun RecircuApp(
         bottomSheetState = bottomSheetState
     )
 
-    val dialogState by mapsViewModel.dialogState.collectAsStateWithLifecycle()
+    val dialogState by appMainViewModel.dialogState.collectAsStateWithLifecycle()
     if (dialogState.shouldShow) {
-        Log.d("Location", "dialog")
         dialogState.dialog?.let {
             RecircuDialog(
                 recircuDialog = it,
                 onDismissRequest = {
-//                    appState.setShowDialog(false)
-                    mapsViewModel.setDialogState(shouldShow = false)
+                    appMainViewModel.setDialogState(shouldShow = false)
                 },
                 onDismiss = {
-                    Log.d("Location", "dialog onDismiss")
-//                    appState.setShowDialog(false)
-                    mapsViewModel.setDialogState(shouldShow = false)
+                    appMainViewModel.setDialogState(shouldShow = false)
                 },
                 onConfirm = {
-                    mapsViewModel.setDialogState(shouldShow = false)
-                    openLocationSettings.invoke()
+                    when (it) {
+                        is GpsDisabledDialog -> {
+                            appMainViewModel.setDialogState(shouldShow = false)
+                            openLocationSettings.invoke()
+                        }
+                        is ConfirmationDialog -> {
+                            when (it.action) {
+                                ConfirmActions.SIGN_OUT -> {
+                                    appMainViewModel.setDialogState(shouldShow = false)
+                                    handleConfirmSignOut(
+                                        context,
+                                        appState,
+                                        googleAuthUiClient
+                                    )
+                                }
+                                else -> Unit
+                            }
+                        }
+                    }
                 }
             )
         }
@@ -188,13 +204,15 @@ fun RecircuApp(
                 RecircuNavHost(
                     startDestination = startDestination,
                     navController = appState.navController,
+                    appMainViewModel = appMainViewModel,
                     showScheduleBottomSheet = { sheetContent ->
                         bottomSheetContent = sheetContent
                         coroutineScope.launch {
                             bottomSheetState.expand()
                         }
                     },
-                    requestFineLocationPermission = requestFineLocationPermission
+                    requestFineLocationPermission = requestFineLocationPermission,
+                    googleAuthUiClient = googleAuthUiClient
                 )
                 // hide the bottom sheet on back press
                 BackHandler(enabled = bottomSheetState.isExpanded) {
@@ -204,6 +222,34 @@ fun RecircuApp(
                     bottomSheetContent = null
                 }
             }
+        }
+    }
+}
+
+fun handleConfirmSignOut(
+    context: Context,
+    appState: RecircuAppState,
+    googleAuthUiClient: GoogleAuthUiClient,
+) {
+    appState.coroutineScope.launch {
+        when (val result = googleAuthUiClient.signOut()) {
+            is AuthResult.Success -> {
+                val navOptions = navOptions {
+                    popUpTo(appState.navController.graph.startDestinationId) {
+                        inclusive = true
+                    }
+                }
+                appState.navController.navigateToAuth(navOptions = navOptions)
+            }
+            is AuthResult.Failure -> {
+                Toast.makeText(
+                    context,
+                    result.e.message,
+                    Toast.LENGTH_LONG
+                )
+                    .show()
+            }
+            else -> Unit
         }
     }
 }
@@ -260,16 +306,3 @@ fun NavDestination?.isBottomBarDestinationInHierarchy(bottomBarDestination: Reci
     this?.hierarchy?.any {
         it.route?.contains(bottomBarDestination.name, ignoreCase = true) ?: false
     } ?: false
-
-@Preview
-@Composable
-fun AppPreview() {
-    MaterialTheme {
-        RecircuApp(
-            onDisplayEdgeToEdgeImmersive = {},
-            openLocationSettings = {},
-            requestFineLocationPermission = {},
-            startDestination = gettingStartedRoute
-        )
-    }
-}

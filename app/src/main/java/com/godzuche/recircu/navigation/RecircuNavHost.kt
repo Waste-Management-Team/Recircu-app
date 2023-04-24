@@ -3,11 +3,11 @@ package com.godzuche.recircu.navigation
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.navOptions
 import com.godzuche.recircu.AppMainViewModel
 import com.godzuche.recircu.RecircuBottomSheetContent
+import com.godzuche.recircu.core.firebase.GoogleAuthUiClient
 import com.godzuche.recircu.feature.authentication.navigation.authGraph
 import com.godzuche.recircu.feature.authentication.navigation.navigateToAuth
 import com.google.accompanist.navigation.animation.AnimatedNavHost
@@ -18,9 +18,10 @@ fun RecircuNavHost(
     navController: NavHostController,
     showScheduleBottomSheet: (RecircuBottomSheetContent) -> Unit,
     requestFineLocationPermission: () -> Unit,
+    googleAuthUiClient: GoogleAuthUiClient,
     modifier: Modifier = Modifier,
     startDestination: String = sellerAuthGraphRoute,
-    appMainViewModel: AppMainViewModel = hiltViewModel()
+    appMainViewModel: AppMainViewModel
 ) {
     AnimatedNavHost(
         navController = navController,
@@ -38,6 +39,7 @@ fun RecircuNavHost(
             },
             nestedGraph = {
                 sellerAuthGraph(
+                    googleAuthUiClient = googleAuthUiClient,
                     navigateToHome = {
                         val navOptions = navOptions {
                             popUpTo(navController.graph.startDestinationId) {
@@ -66,6 +68,7 @@ fun RecircuNavHost(
                     }
                 )
                 buyersAdsScreen(
+                    appMainViewModel = appMainViewModel,
                     navigateUp = {
                         navController.popBackStack()
                     },
@@ -82,6 +85,16 @@ fun RecircuNavHost(
         sellerExploreScreen()
         connectScreen()
         sellerProfileGraph(
+            appMainViewModel = appMainViewModel,
+            googleAuthUiClient = googleAuthUiClient,
+            navigateToAuthentication = {
+                val navOptions = navOptions {
+                    popUpTo(navController.graph.startDestinationId) {
+                        inclusive = true
+                    }
+                }
+                navController.navigateToAuth(navOptions = navOptions)
+            },
             nestedGraphs = {
                 sellerAccountScreen()
             }

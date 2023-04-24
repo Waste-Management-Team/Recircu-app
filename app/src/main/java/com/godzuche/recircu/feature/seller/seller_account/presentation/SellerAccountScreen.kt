@@ -40,7 +40,6 @@ fun SellerAccountScreen(
 
     val context = LocalContext.current
     val googleAuthUiClientImpl = GoogleAuthUiClientImpl(
-        context = context,
         oneTapClient = Identity.getSignInClient(context),
         auth = Firebase.auth
     )

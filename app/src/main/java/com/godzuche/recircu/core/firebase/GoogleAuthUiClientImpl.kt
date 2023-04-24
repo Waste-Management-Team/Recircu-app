@@ -1,6 +1,5 @@
 package com.godzuche.recircu.core.firebase
 
-import android.content.Context
 import android.content.Intent
 import android.content.IntentSender
 import android.util.Log
@@ -20,19 +19,17 @@ import javax.inject.Inject
 
 const val TAG = "GoogleAuthUiClient"
 
-//Todo: Create an abstraction of this class using interface
 class GoogleAuthUiClientImpl @Inject constructor(
-    private val context: Context,
     private val auth: FirebaseAuth,
     private val oneTapClient: SignInClient
-): GoogleAuthUiClient {
+) : GoogleAuthUiClient {
 
-    override suspend fun signIn(): OneTapSignInRespose {
+    override suspend fun signIn(): OneTapSignInResponse {
         val result = try {
             val signInResult = oneTapClient.beginSignIn(
                 buildSignInRequest()
             ).await()
-            OneTapSignInRespose.Success(
+            OneTapSignInResponse.Success(
                 data = signInResult?.pendingIntent?.intentSender
             )
         } catch (e: Exception) {
@@ -40,16 +37,16 @@ class GoogleAuthUiClientImpl @Inject constructor(
             if (e is CancellationException) throw e
 //            Log.d(TAG, "Can't open One Tap UI: ${e.message}")
 //            null
-            OneTapSignInRespose.Failure(e)
+            OneTapSignInResponse.Failure(e)
             try {
                 val signUpResult = oneTapClient.beginSignIn(
                     buildSignUpRequest()
                 ).await()
-                OneTapSignInRespose.Success(
+                OneTapSignInResponse.Success(
                     data = signUpResult?.pendingIntent?.intentSender
                 )
             } catch (e: Exception) {
-                OneTapSignInRespose.Failure(e)
+                OneTapSignInResponse.Failure(e)
             }
         }
         return result
@@ -102,7 +99,7 @@ class GoogleAuthUiClientImpl @Inject constructor(
                     }
                     else -> Log.d(TAG, "One-tap encountered an else api error.")
                 }
-            } else Log.d(TAG, "One-tap encountered an else not_api error.")
+            } else Log.d(TAG, "One-tap encountered a not_api error.")
             SignInResult(
                 data = null,
                 errorMessage = it.message
@@ -110,14 +107,15 @@ class GoogleAuthUiClientImpl @Inject constructor(
         }
     }
 
-    override suspend fun signOut() {
-        try {
+    override suspend fun signOut(): AuthResult {
+        return try {
             oneTapClient.signOut().await()
             auth.signOut()
+            AuthResult.Success
         } catch (it: Exception) {
             it.printStackTrace()
             if (it is CancellationException) throw it
-
+            AuthResult.Failure(it)
         }
     }
 
@@ -156,7 +154,12 @@ class GoogleAuthUiClientImpl @Inject constructor(
     }
 }
 
-sealed interface OneTapSignInRespose {
-    data class Success(val data: IntentSender?) : OneTapSignInRespose
-    data class Failure(val e: Exception) : OneTapSignInRespose
+sealed interface OneTapSignInResponse {
+    data class Success(val data: IntentSender?) : OneTapSignInResponse
+    data class Failure(val e: Exception) : OneTapSignInResponse
+}
+
+sealed interface AuthResult {
+    object Success : AuthResult
+    data class Failure(val e: Exception) : AuthResult
 }

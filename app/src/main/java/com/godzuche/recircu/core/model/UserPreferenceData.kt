@@ -1,4 +1,4 @@
-package com.godzuche.recircu.core.domain.model
+package com.godzuche.recircu.core.model
 
 data class UserPreferenceData(
     val isOnboardingCompleted: Boolean

@@ -1,4 +1,4 @@
-package com.godzuche.recircu.core.domain.repository
+package com.godzuche.recircu.core.data.repository
 
 import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.AuthResult

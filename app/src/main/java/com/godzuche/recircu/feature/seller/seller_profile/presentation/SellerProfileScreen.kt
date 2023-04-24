@@ -42,36 +42,45 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import coil.size.Size
+import com.godzuche.recircu.AppMainViewModel
+import com.godzuche.recircu.ConfirmActions
+import com.godzuche.recircu.ConfirmationDialog
 import com.godzuche.recircu.core.designsystem.components.RecircuAnimatedCircle
 import com.godzuche.recircu.core.designsystem.icon.RecircuIcons
 import com.godzuche.recircu.core.designsystem.theme.fontFamily
-import com.godzuche.recircu.core.firebase.GoogleAuthUiClientImpl
+import com.godzuche.recircu.core.firebase.GoogleAuthUiClient
 import com.godzuche.recircu.feature.seller.seller_dashboard.presentation.HomeSection
 import com.godzuche.recircu.feature.seller.seller_dashboard.presentation.User
 import com.godzuche.recircu.feature.seller.seller_dashboard.presentation.UserState
 import com.godzuche.recircu.feature.seller.seller_dashboard.presentation.WasteType
-import com.google.android.gms.auth.api.identity.Identity
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
 
 @Composable
 fun SellerProfileRoute(
+    navigateToAuthentication: () -> Unit,
+    googleAuthUiClient: GoogleAuthUiClient,
     modifier: Modifier = Modifier,
-    viewModel: SellerProfileViewModel = hiltViewModel()
+    sellerProfileViewModel: SellerProfileViewModel = hiltViewModel(),
+    appMainViewModel: AppMainViewModel
 ) {
-    val userState by viewModel.userState.collectAsStateWithLifecycle()
-    val context = LocalContext.current
-    val googleAuthUiClient = GoogleAuthUiClientImpl(
-        context = context,
-        auth = Firebase.auth,
-        oneTapClient = Identity.getSignInClient(context)
-    )
+    val userState by sellerProfileViewModel.userState.collectAsStateWithLifecycle()
 
-    viewModel.onGetCurrentUser(googleAuthUiClient.getSignedInUser())
+    sellerProfileViewModel.onGetCurrentUser(googleAuthUiClient.getSignedInUser())
 
     SellerProfileScreen(
         modifier = modifier,
-        userState = userState
+        userState = userState,
+        onSignOutClick = {
+            appMainViewModel.setDialogState(
+                shouldShow = true,
+                dialog = ConfirmationDialog(
+                    titleText = "Sign Out",
+                    descriptionText = "Are you sure you want to sign out?",
+                    cancelText = "Cancel",
+                    okText = "Sign out",
+                    action = ConfirmActions.SIGN_OUT
+                )
+            )
+        }
     )
 }
 
@@ -79,6 +88,7 @@ fun SellerProfileRoute(
 @Composable
 fun SellerProfileScreen(
     userState: UserState,
+    onSignOutClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val lazyGridState = rememberLazyGridState()
@@ -137,7 +147,7 @@ fun SellerProfileScreen(
         }
         item(span = { GridItemSpan(maxLineSpan) }) {
             val totalWasteRecycled = 20
-            val recycledWasteStats = listOf<Triple<WasteType, Float, Color>>(
+            val recycledWasteStats = listOf(
                 Triple(WasteType.Plastic, 0.35f, Color.Cyan),
                 Triple(WasteType.Metal, 0.2f, Color.Blue),
                 Triple(WasteType.Paper, 0.25f, Color.Yellow),
@@ -216,7 +226,7 @@ fun SellerProfileScreen(
         }
         item(span = { GridItemSpan(maxLineSpan) }) {
             TextButton(
-                onClick = {},
+                onClick = onSignOutClick,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(text = "Sign out")

@@ -47,7 +47,6 @@ fun SellerHomeRoute(
 
     val context = LocalContext.current
     val googleAuthUiClientImpl = GoogleAuthUiClientImpl(
-        context = context,
         auth = Firebase.auth,
         oneTapClient = Identity.getSignInClient(context)
     )

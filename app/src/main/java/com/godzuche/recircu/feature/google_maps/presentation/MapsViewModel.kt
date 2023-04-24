@@ -2,15 +2,10 @@ package com.godzuche.recircu.feature.google_maps.presentation
 
 import android.app.Application
 import android.location.Location
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.godzuche.recircu.GpsDisabledDialog
 import com.godzuche.recircu.RecircuDialog
-import com.godzuche.recircu.core.domain.location.LocationClient
-import com.godzuche.recircu.core.location.LocationErrorType
-import com.godzuche.recircu.core.location.LocationResult
-import com.godzuche.recircu.core.util.hasLocationPermission
+import com.godzuche.recircu.core.location.LocationClient
 import com.godzuche.recircu.feature.google_maps.PlacesAutocompleteResult
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.model.Place
@@ -18,7 +13,6 @@ import com.google.android.libraries.places.api.net.FetchPlaceRequest
 import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest
 import com.google.android.libraries.places.api.net.PlacesClient
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -50,14 +44,14 @@ class MapsViewModel @Inject constructor(
         initialValue = MapsState()
     )
 
-    private val _dialogState = MutableStateFlow(DialogState())
-    val dialogState get() = _dialogState.asStateFlow()
+/*    private val _dialogState = MutableStateFlow(DialogState())
+    val dialogState get() = _dialogState.asStateFlow()*/
 
     private var job: Job? = null
 
-    init {
+/*    init {
         getLastLocation()
-    }
+    }*/
 
     // should be called when the user clicks on a place in the suggestion
     fun getCordinates(result: PlacesAutocompleteResult) {
@@ -106,7 +100,7 @@ class MapsViewModel @Inject constructor(
         }
     }
 
-    fun getLastLocation() {
+/*    fun getLastLocation() {
         _state.update {
             it.copy(
                 isLocationPermissionEnabled = app.applicationContext.hasLocationPermission()
@@ -160,7 +154,7 @@ class MapsViewModel @Inject constructor(
                 dialog = dialog
             )
         }
-    }
+    }*/
 
     fun stopPlacesSearch() {
         _locationAutofill.update {

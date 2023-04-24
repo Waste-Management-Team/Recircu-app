@@ -5,6 +5,8 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.navigation
+import com.godzuche.recircu.AppMainViewModel
+import com.godzuche.recircu.core.firebase.GoogleAuthUiClient
 import com.godzuche.recircu.feature.seller.seller_profile.presentation.SellerProfileRoute
 import com.google.accompanist.navigation.animation.composable
 
@@ -18,6 +20,9 @@ fun NavController.navigateToSellerProfile(navOptions: NavOptions? = null) {
 
 @OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.sellerProfileGraph(
+    appMainViewModel: AppMainViewModel,
+    googleAuthUiClient: GoogleAuthUiClient,
+    navigateToAuthentication: () -> Unit,
     nestedGraphs: NavGraphBuilder.() -> Unit
 ) {
     navigation(
@@ -25,7 +30,11 @@ fun NavGraphBuilder.sellerProfileGraph(
         startDestination = sellerProfileRoute
     ) {
         composable(sellerProfileRoute) {
-            SellerProfileRoute()
+            SellerProfileRoute(
+                appMainViewModel = appMainViewModel,
+                navigateToAuthentication = navigateToAuthentication,
+                googleAuthUiClient = googleAuthUiClient
+            )
         }
         nestedGraphs()
     }

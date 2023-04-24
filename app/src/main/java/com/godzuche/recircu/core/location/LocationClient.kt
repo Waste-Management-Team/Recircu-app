@@ -1,6 +1,5 @@
-package com.godzuche.recircu.core.domain.location
+package com.godzuche.recircu.core.location
 
-import com.godzuche.recircu.core.location.LocationResult
 import kotlinx.coroutines.flow.Flow
 
 interface LocationClient {

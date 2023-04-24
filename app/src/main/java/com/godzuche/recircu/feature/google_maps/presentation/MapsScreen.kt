@@ -20,13 +20,13 @@ import com.google.maps.android.compose.*
 fun MapsRoute(
     navigateBack: () -> Unit,
     requestFineLocationPermission: () -> Unit,
-    viewModel: MapsViewModel = hiltViewModel()
+    mapsViewModel: MapsViewModel = hiltViewModel()
 ) {
 //    viewModel.getLastLocation()
-    val state by viewModel.state.collectAsStateWithLifecycle()
+    val mapState by mapsViewModel.state.collectAsStateWithLifecycle()
 
     MapsScreen(
-        state = state,
+        mapsState = mapState,
         navigateBack = navigateBack,
         requestFineLocationPermission = requestFineLocationPermission
     )
@@ -34,18 +34,20 @@ fun MapsRoute(
 
 @Composable
 fun MapsScreen(
-    state: MapsState,
+    mapsState: MapsState,
     navigateBack: () -> Unit,
     requestFineLocationPermission: () -> Unit
 ) {
-    if (!state.isLocationPermissionEnabled) {
+/*
+    if (!mapsState.isLocationPermissionEnabled) {
         Log.d("Location", "reqPerms in map screen")
         requestFineLocationPermission.invoke()
     } else {
         Log.d("Location", "reqPerms in map screen else")
     }
+*/
 
-    val lastLocation = state.lastLocation?.let {
+    val lastLocation = mapsState.lastLocation?.let {
         LatLng(it.latitude, it.longitude)
     }
 
@@ -63,7 +65,7 @@ fun MapsScreen(
     Box(modifier = Modifier.fillMaxSize()) {
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
-            properties = state.properties,
+            properties = mapsState.properties,
             cameraPositionState = cameraPositionState,
             uiSettings = MapUiSettings(
 //                mapToolbarEnabled = true,

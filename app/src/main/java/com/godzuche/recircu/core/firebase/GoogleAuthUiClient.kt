@@ -5,8 +5,8 @@ import com.godzuche.recircu.feature.authentication.presentation.SignInResult
 import com.godzuche.recircu.feature.authentication.presentation.UserData
 
 interface GoogleAuthUiClient {
-    suspend fun signIn(): OneTapSignInRespose
+    suspend fun signIn(): OneTapSignInResponse
     suspend fun signInWithIntent(intent: Intent): SignInResult
-    suspend fun signOut()
+    suspend fun signOut(): AuthResult
     fun getSignedInUser(): UserData?
 }

@@ -1,6 +1,6 @@
-package com.godzuche.recircu.core.domain.repository
+package com.godzuche.recircu.core.data.repository
 
-import com.godzuche.recircu.core.domain.model.UserPreferenceData
+import com.godzuche.recircu.core.model.UserPreferenceData
 import kotlinx.coroutines.flow.Flow
 
 interface UserDataRepository {

@@ -1,6 +1,5 @@
 package com.godzuche.recircu.core.data.repository
 
-import com.godzuche.recircu.core.domain.repository.AuthRepository
 import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
