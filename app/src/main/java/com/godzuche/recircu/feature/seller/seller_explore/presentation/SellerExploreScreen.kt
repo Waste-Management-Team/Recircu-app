@@ -4,9 +4,9 @@ import androidx.annotation.DrawableRes
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.*
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
+import androidx.compose.foundation.*
+import androidx.compose.foundation.gestures.snapping.SnapLayoutInfoProvider
+import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ContentAlpha
@@ -52,7 +53,7 @@ fun SellerExploreRoute(
     )
 }
 
-@OptIn(ExperimentalAnimationApi::class)
+@OptIn(ExperimentalAnimationApi::class, ExperimentalFoundationApi::class)
 @Composable
 fun SellerExploreScreen(
     uiState: SellerHomeUiState,
@@ -63,6 +64,14 @@ fun SellerExploreScreen(
         mutableStateOf(ExploreTab.EVENT)
     }
 
+    val spotlightsLazyRowState = rememberLazyListState()
+    val infiniteList = spotlights.toMutableStateList()
+    val snappingLayout =
+        remember(spotlightsLazyRowState) {
+            SnapLayoutInfoProvider(spotlightsLazyRowState)
+        }
+    val flingBehavior = rememberSnapFlingBehavior(snappingLayout)
+    val wasteTypesLazyListState = rememberLazyListState()
     LazyVerticalGrid(
         state = lazyGridState,
         columns = GridCells.Adaptive(160.dp),
@@ -75,19 +84,49 @@ fun SellerExploreScreen(
     ) {
         item(span = { GridItemSpan(maxLineSpan) }) {
             LazyRow(
-                state = rememberLazyListState(),
+                state = spotlightsLazyRowState,
                 modifier = Modifier
                     .fillMaxWidth()
                     .removeWidthConstraint(16.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
-                contentPadding = PaddingValues(16.dp)
+                contentPadding = PaddingValues(16.dp),
+                flingBehavior = flingBehavior
             ) {
-                items(
-                    items = spotlights,
-                    key = { it.title },
-                ) {
+                itemsIndexed(
+                    items = infiniteList,
+                    key = { index, item ->
+                        item.title
+                    },
+//                spotlights.size + 2
+                ) { index, item ->
+                    /*val itemIndex = when (index) {
+                        0 -> spotlights.size - 1
+                        spotlights.size + 1 -> 0
+                        else -> {
+                            index - 1
+                        }
+                    }*/
+                    /*val realIndex = if (index >= spotlights.size) {
+                        index - spotlights.size
+                    } else {
+                        index
+                    }*/
+                    /*when (index) {
+                        0 -> {
+                            Log.d("Spotlight", "index = 0")
+                            val lastItem = infiniteList.last()
+                            infiniteList.add(0, lastItem)
+                            infiniteList.removeLast()
+                        }
+                        infiniteList.size - 1 -> {
+                            Log.d("Spotlight", "index = last")
+                            val firstItem = infiniteList.first()
+                            infiniteList.removeFirst()
+                            infiniteList.add(firstItem)
+                        }
+                    }*/
                     Spotlights(
-                        spotlight = it,
+                        spotlight = item,
                         spotlights = spotlights
                     )
                 }
@@ -95,9 +134,10 @@ fun SellerExploreScreen(
         }
         item(span = { GridItemSpan(maxLineSpan) }) {
             LazyRow(
-                state = rememberLazyListState(),
+                state = wasteTypesLazyListState,
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 contentPadding = PaddingValues(16.dp),
+                flingBehavior = rememberSnapFlingBehavior(lazyListState = wasteTypesLazyListState),
                 modifier = Modifier
                     .fillMaxWidth()
                     .removeWidthConstraint(16.dp)
