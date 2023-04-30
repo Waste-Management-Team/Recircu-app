@@ -36,6 +36,7 @@ import com.godzuche.recircu.core.firebase.AuthResult
 import com.godzuche.recircu.core.firebase.GoogleAuthUiClient
 import com.godzuche.recircu.feature.authentication.navigation.navigateToAuth
 import com.godzuche.recircu.feature.google_maps.presentation.MapsRoute
+import com.godzuche.recircu.feature.seller.buyers_ads.navigation.buyersAdsRoute
 import com.godzuche.recircu.feature.seller.schedule.ScheduleBottomSheetContent
 import com.godzuche.recircu.navigation.*
 import kotlinx.coroutines.launch
@@ -94,7 +95,6 @@ fun RecircuApp(
                                         googleAuthUiClient
                                     )
                                 }
-                                else -> Unit
                             }
                         }
                     }
@@ -249,7 +249,6 @@ fun handleConfirmSignOut(
                 )
                     .show()
             }
-            else -> Unit
         }
     }
 }

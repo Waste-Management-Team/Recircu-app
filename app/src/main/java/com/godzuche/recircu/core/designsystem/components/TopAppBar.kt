@@ -16,6 +16,7 @@ import androidx.navigation.NavDestination
 import com.godzuche.recircu.R
 import com.godzuche.recircu.core.designsystem.icon.RecircuIcons
 import com.godzuche.recircu.core.ui.shimmerEffect
+import com.godzuche.recircu.feature.seller.buyers_ads.navigation.buyersAdsRoute
 import com.godzuche.recircu.feature.seller.seller_dashboard.presentation.UserState
 import com.godzuche.recircu.navigation.*
 

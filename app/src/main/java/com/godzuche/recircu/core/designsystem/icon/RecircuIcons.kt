@@ -30,6 +30,8 @@ object RecircuIcons {
     val Avatar12 = R.drawable.avatar_12
     val Edit = Icons.Filled.Edit
     val Google24 = R.drawable.icons8_google_24
+    val Map = Icons.Filled.Map
+    val List = Icons.Filled.List
 }
 
 sealed interface RecircuIcon {

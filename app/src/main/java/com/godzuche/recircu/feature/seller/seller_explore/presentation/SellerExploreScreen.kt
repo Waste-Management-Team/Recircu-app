@@ -96,8 +96,7 @@ fun SellerExploreScreen(
                     items = infiniteList,
                     key = { index, item ->
                         item.title
-                    },
-//                spotlights.size + 2
+                    }
                 ) { index, item ->
                     /*val itemIndex = when (index) {
                         0 -> spotlights.size - 1
@@ -157,18 +156,6 @@ fun SellerExploreScreen(
         }
         item(span = { GridItemSpan(maxLineSpan) }) {
             AnimatedContent(targetState = exploreTab) {
-                /*               Box(
-                                   modifier = Modifier
-                                       .fillMaxWidth()
-                                       .height(400.dp)
-                                       .background(
-                                           color = when (exploreTab) {
-                                               ExploreTab.DISCOVER -> Color.Red
-                                               ExploreTab.EVENT -> Color.Blue
-                                               ExploreTab.LEARN -> Color.Green
-                                           }
-                                       )
-                               )*/
                 val msg = when (exploreTab) {
                     ExploreTab.EVENT -> {
                         "Events will appear here"

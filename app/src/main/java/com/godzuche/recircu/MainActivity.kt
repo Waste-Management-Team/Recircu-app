@@ -91,7 +91,7 @@ class MainActivity : ComponentActivity() {
                     }
                 }
                 if (uiState is MainActivityUiState.Success) {
-                    if (!(uiState as MainActivityUiState.Success).isLocationPermissionGranted) {
+                    if ((uiState as MainActivityUiState.Success).isLocationPermissionGranted.not()) {
                         multiplePermissionsResultLauncher.launch(
                             arrayOf(
                                 Manifest.permission.ACCESS_FINE_LOCATION
@@ -156,9 +156,7 @@ class MainActivity : ComponentActivity() {
                                 }
                                 else -> return@forEach
                             },
-                            isPermanentlyDeclined = !shouldShowRequestPermissionRationale(
-                                permission
-                            ),
+                            isPermanentlyDeclined = shouldShowRequestPermissionRationale(permission).not(),
                             onDismiss = appMainViewModel::dismissPermissionDialog,
                             onOkClicked = {
                                 appMainViewModel.dismissPermissionDialog()

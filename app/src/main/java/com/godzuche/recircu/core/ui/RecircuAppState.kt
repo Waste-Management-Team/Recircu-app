@@ -6,6 +6,7 @@ import androidx.navigation.NavDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navOptions
+import com.godzuche.recircu.feature.seller.buyers_ads.navigation.buyersAdsRoute
 import com.godzuche.recircu.navigation.*
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import kotlinx.coroutines.CoroutineScope

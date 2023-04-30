@@ -10,6 +10,8 @@ import com.godzuche.recircu.RecircuBottomSheetContent
 import com.godzuche.recircu.core.firebase.GoogleAuthUiClient
 import com.godzuche.recircu.feature.authentication.navigation.authGraph
 import com.godzuche.recircu.feature.authentication.navigation.navigateToAuth
+import com.godzuche.recircu.feature.seller.buyers_ads.navigation.buyersAdsScreen
+import com.godzuche.recircu.feature.seller.buyers_ads.navigation.navigateToBuyersAds
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 
 @OptIn(ExperimentalAnimationApi::class)
@@ -19,13 +21,14 @@ fun RecircuNavHost(
     showScheduleBottomSheet: (RecircuBottomSheetContent) -> Unit,
     requestFineLocationPermission: () -> Unit,
     googleAuthUiClient: GoogleAuthUiClient,
+    appMainViewModel: AppMainViewModel,
     modifier: Modifier = Modifier,
-    startDestination: String = sellerAuthGraphRoute,
-    appMainViewModel: AppMainViewModel
+    startDestination: String = sellerAuthGraphRoute
 ) {
     AnimatedNavHost(
         navController = navController,
-        startDestination = startDestination
+        startDestination = startDestination,
+        modifier = modifier
     ) {
         gettingStartedScreen(
             navigateToAuthentication = {
