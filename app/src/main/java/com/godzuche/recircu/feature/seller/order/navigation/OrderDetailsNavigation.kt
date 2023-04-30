@@ -5,7 +5,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import com.godzuche.recircu.RecircuBottomSheetContent
-import com.godzuche.recircu.feature.seller.order.OrderDetailsRoute
+import com.godzuche.recircu.feature.seller.order.presentation.OrderDetailsRoute
 import com.google.accompanist.navigation.animation.composable
 
 const val orderDetailsRoute = "order_details_route"

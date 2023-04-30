@@ -24,6 +24,7 @@ class MapsViewModel @Inject constructor(
     private val placesClient: PlacesClient,
     private val app: Application
 ) : AndroidViewModel(app) {
+    // Todo: Use the lastLocation data from the appViewModel instead and remove this one
     private val _lastLocation: MutableStateFlow<Location?> = MutableStateFlow(null)
     val lastLocation: StateFlow<Location?> get() = _lastLocation.asStateFlow()
 
@@ -43,9 +44,6 @@ class MapsViewModel @Inject constructor(
         started = SharingStarted.WhileSubscribed(5_000),
         initialValue = MapsState()
     )
-
-/*    private val _dialogState = MutableStateFlow(DialogState())
-    val dialogState get() = _dialogState.asStateFlow()*/
 
     private var job: Job? = null
 
@@ -99,62 +97,6 @@ class MapsViewModel @Inject constructor(
                 }
         }
     }
-
-/*    fun getLastLocation() {
-        _state.update {
-            it.copy(
-                isLocationPermissionEnabled = app.applicationContext.hasLocationPermission()
-            )
-        }
-        viewModelScope.launch(Dispatchers.IO) {
-            locationClient.getLocation()
-                .collect { result ->
-                    when (result) {
-                        is LocationResult.Success -> {
-                            Log.d("Location", "Success ${result.location.latitude}")
-                            _lastLocation.update {
-                                result.location
-                            }
-                            _state.update {
-                                it.copy(
-                                    properties = it.properties.copy(isMyLocationEnabled = _lastLocation.value != null)
-                                )
-                            }
-                        }
-                        is LocationResult.Error -> {
-//                            Log.d("Location", "Error")
-                            when (result.errorType) {
-                                LocationErrorType.DISABLED_GPS -> {
-                                    _dialogState.update {
-                                        it.copy(
-                                            shouldShow = true,
-                                            dialog = GpsDisabledDialog()
-                                        )
-                                    }
-                                }
-                                LocationErrorType.MISSING_PERMISSION -> {
-                                    _state.update {
-                                        it.copy(
-                                            isLocationPermissionEnabled = false
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-        }
-    }
-
-    fun setDialogState(shouldShow: Boolean, dialog: RecircuDialog? = null) {
-        Log.d("Location", "setShow dialog called shouldShow = $shouldShow")
-        _dialogState.update {
-            it.copy(
-                shouldShow = shouldShow,
-                dialog = dialog
-            )
-        }
-    }*/
 
     fun stopPlacesSearch() {
         _locationAutofill.update {

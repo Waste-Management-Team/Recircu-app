@@ -21,6 +21,7 @@ import androidx.compose.material.ContentAlpha
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -60,10 +61,9 @@ fun SellerExploreScreen(
     modifier: Modifier = Modifier
 ) {
     val lazyGridState = rememberLazyGridState()
-    var exploreTab by remember {
+    var exploreTab by rememberSaveable {
         mutableStateOf(ExploreTab.EVENT)
     }
-
     val spotlightsLazyRowState = rememberLazyListState()
     val infiniteList = spotlights.toMutableStateList()
     val snappingLayout =
@@ -72,6 +72,7 @@ fun SellerExploreScreen(
         }
     val flingBehavior = rememberSnapFlingBehavior(snappingLayout)
     val wasteTypesLazyListState = rememberLazyListState()
+
     LazyVerticalGrid(
         state = lazyGridState,
         columns = GridCells.Adaptive(160.dp),

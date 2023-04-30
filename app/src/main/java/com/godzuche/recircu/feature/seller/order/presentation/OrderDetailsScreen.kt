@@ -1,4 +1,4 @@
-package com.godzuche.recircu.feature.seller.order
+package com.godzuche.recircu.feature.seller.order.presentation
 
 import android.location.Location
 import android.net.Uri
@@ -76,9 +76,9 @@ fun OrderDetailsRoute(
 @Composable
 fun OrderDetailsScreen(
     lastLocation: Location?,
-    showScheduleBottomSheet: (RecircuBottomSheetContent) -> Unit,
-    locationAutofill: List<PlacesAutocompleteResult>,
     selectedLocation: LatLng,
+    locationAutofill: List<PlacesAutocompleteResult>,
+    showScheduleBottomSheet: (RecircuBottomSheetContent) -> Unit,
     onLocationQueryChange: (String) -> Unit,
     onPlaceClick: (PlacesAutocompleteResult) -> Unit,
     modifier: Modifier = Modifier
@@ -130,9 +130,9 @@ fun OrderDetailsScreen(
                         autoCorrect = false
                     ),
                     onGetMyLocationFromMap = {
-                        showScheduleBottomSheet.invoke(
+                        /*showScheduleBottomSheet.invoke(
                             RecircuBottomSheetContent.MAP
-                        )
+                        )*/
                     },
                     singleLine = true
                 )

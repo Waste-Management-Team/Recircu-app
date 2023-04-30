@@ -1,5 +1,6 @@
 package com.godzuche.recircu.feature.seller.buyers_ads.presentation
 
+import androidx.compose.animation.*
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -14,6 +15,7 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -36,7 +38,7 @@ fun BuyersAdsRoute(
     val buyersAdsState by buyersAdsViewModel.state.collectAsStateWithLifecycle()
 
     BuyersAdsScreen(
-        state = buyersAdsState,
+        uiState = buyersAdsState,
         onBackPress = navigateUp,
         requestFineLocationPermission = requestFineLocationPermission,
         toggleAdsViewMode = {
@@ -56,7 +58,7 @@ fun BuyersAdsRoute(
 )
 @Composable
 fun BuyersAdsScreen(
-    state: BuyersAdsState,
+    uiState: BuyersAdsState,
     onBackPress: () -> Unit,
     toggleAdsViewMode: () -> Unit,
     requestFineLocationPermission: () -> Unit,
@@ -67,7 +69,7 @@ fun BuyersAdsScreen(
 ) {
     val lazyGridState = rememberLazyGridState()
 
-    val active = state.searchQuery.isNotEmpty()
+    val active = uiState.searchQuery.isNotEmpty()
 
     val keyboardController = LocalSoftwareKeyboardController.current
     Column {
@@ -94,7 +96,7 @@ fun BuyersAdsScreen(
                     onClick = toggleAdsViewMode
                 ) {
                     Icon(
-                        imageVector = if (state.isMapView) {
+                        imageVector = if (uiState.isMapView) {
                             RecircuIcons.Map
                         } else {
                             RecircuIcons.List
@@ -114,7 +116,7 @@ fun BuyersAdsScreen(
             }
         )
         SearchBar(
-            query = state.searchQuery,
+            query = uiState.searchQuery,
             onQueryChange = { newQueryText ->
                 onSearchQueryChange.invoke(newQueryText)
             },
@@ -132,13 +134,19 @@ fun BuyersAdsScreen(
                 )
             },
             trailingIcon = {
-                Icon(
-                    imageVector = Icons.Filled.Clear,
-                    contentDescription = "Clear",
-                    modifier = Modifier.clickable {
-                        clearSearchQuery.invoke()
-                    }
-                )
+                AnimatedVisibility(
+                    visible = uiState.searchQuery.isNotEmpty(),
+                    enter = fadeIn() + expandIn(expandFrom = Alignment.Center),
+                    exit = shrinkOut(shrinkTowards = Alignment.Center) + fadeOut()
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Clear,
+                        contentDescription = "Clear",
+                        modifier = Modifier.clickable {
+                            clearSearchQuery.invoke()
+                        }
+                    )
+                }
             },
             windowInsets = WindowInsets(0, 0, 0, 0),
             placeholder = {
@@ -151,7 +159,7 @@ fun BuyersAdsScreen(
         ) {
         }
         Spacer(modifier = Modifier.height(8.dp))
-        when (state.adsViewMode) {
+        when (uiState.adsViewMode) {
             BuyersAdsView.LIST -> {
                 LazyVerticalGrid(
                     state = lazyGridState,

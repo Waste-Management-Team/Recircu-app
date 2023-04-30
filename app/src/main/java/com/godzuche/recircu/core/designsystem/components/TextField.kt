@@ -50,10 +50,10 @@ fun DetailsTextField(
             modifier = Modifier
                 .fillMaxWidth()
                 .border(BorderStroke(0.dp, Color.Transparent)),
-            colors = TextFieldDefaults.textFieldColors(
+            colors = TextFieldDefaults.colors(
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
-                disabledIndicatorColor = Color.Transparent
+                disabledIndicatorColor = Color.Transparent,
             ),
             shape = RectangleShape,
             leadingIcon = leadingIcon,
@@ -65,7 +65,6 @@ fun DetailsTextField(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LocationTextField(
     label: String,
@@ -107,10 +106,10 @@ fun LocationTextField(
                 modifier = Modifier
                     .weight(1f, fill = true)
                     .border(BorderStroke(0.dp, Color.Transparent)),
-                colors = TextFieldDefaults.textFieldColors(
+                colors = TextFieldDefaults.colors(
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent,
-                    disabledIndicatorColor = Color.Transparent
+                    disabledIndicatorColor = Color.Transparent,
                 ),
                 shape = RectangleShape,
                 leadingIcon = leadingIcon,
