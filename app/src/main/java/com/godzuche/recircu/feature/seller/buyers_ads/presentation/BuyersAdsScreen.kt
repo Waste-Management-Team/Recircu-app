@@ -1,6 +1,5 @@
-package com.godzuche.recircu.feature.seller.buyers_ads
+package com.godzuche.recircu.feature.seller.buyers_ads.presentation
 
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -8,9 +7,13 @@ import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.FilterList
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -18,31 +21,32 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.godzuche.recircu.AppMainViewModel
+import com.godzuche.recircu.core.designsystem.icon.RecircuIcons
 import com.godzuche.recircu.feature.google_maps.presentation.MapsRoute
-import com.godzuche.recircu.feature.google_maps.presentation.MapsViewModel
 
 @Composable
 fun BuyersAdsRoute(
     appMainViewModel: AppMainViewModel,
     requestFineLocationPermission: () -> Unit,
     navigateUp: () -> Unit,
-    mapsViewModel: MapsViewModel = hiltViewModel()
-//    viewModel: BuyersAdsViewModel = hiltViewModel()
+    buyersAdsViewModel: BuyersAdsViewModel = hiltViewModel()
 ) {
-//    val state by viewModel.state.collectAsStateWithLifecycle()
-//    val isMapView by viewModel.isMapView.collectAsStateWithLifecycle()
-//    Log.d("BuyersAds C", state.view.name)
+    // Todo: remove the requestFineLocationPermission parameter and use the getLocation() function in
+    //  appMainViewModel or better still create a separate function to request the permission in the viewModel
+    val buyersAdsState by buyersAdsViewModel.state.collectAsStateWithLifecycle()
 
     BuyersAdsScreen(
+        state = buyersAdsState,
         onBackPress = navigateUp,
         requestFineLocationPermission = requestFineLocationPermission,
-        toggleMapView = {
-            if (it) {
-                Log.d("Location", "toggle map view")
-//                mapsViewModel.getLastLocation()
-                appMainViewModel.getLastLocation()
-            } else Unit
-        }
+        toggleAdsViewMode = {
+            // Try to get last location when switching to Map view and request fine location permission if needed
+            if (buyersAdsState.isMapView.not()) appMainViewModel.getLastLocation()
+            buyersAdsViewModel.setViewType(buyersAdsState.isMapView.not())
+        },
+        onSearchQueryChange = buyersAdsViewModel::onSearchQueryChange,
+        onSearch = buyersAdsViewModel::search,
+        clearSearchQuery = buyersAdsViewModel::clearSearchQueryText
     )
 }
 
@@ -52,25 +56,18 @@ fun BuyersAdsRoute(
 )
 @Composable
 fun BuyersAdsScreen(
-//    state: BuyersAdsState,
-//    isMapView: Boolean,
+    state: BuyersAdsState,
     onBackPress: () -> Unit,
-    toggleMapView: (Boolean) -> Unit,
+    toggleAdsViewMode: () -> Unit,
     requestFineLocationPermission: () -> Unit,
-    modifier: Modifier = Modifier,
-    buyersAdsViewModel: BuyersAdsViewModel = hiltViewModel()
+    onSearchQueryChange: (String) -> Unit,
+    onSearch: (String) -> Unit,
+    clearSearchQuery: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val lazyGridState = rememberLazyGridState()
-    val state by buyersAdsViewModel.state.collectAsStateWithLifecycle()
 
-//    Log.d("BuyersAds", state.view.toString())
-
-    var query by remember {
-        mutableStateOf("")
-    }
-    var active by remember {
-        mutableStateOf(false)
-    }
+    val active = state.searchQuery.isNotEmpty()
 
     val keyboardController = LocalSoftwareKeyboardController.current
     Column {
@@ -94,19 +91,14 @@ fun BuyersAdsScreen(
 //            scrollBehavior = scrollBehavior,
             actions = {
                 IconButton(
-                    onClick = {
-                        /*if (buyersAdsState.view == BuyersAdsView.LIST) {
-                            buyersAdsViewModel.setViewType(isMapView = true)
-                        } else {
-                            buyersAdsViewModel.setViewType(isMapView = false)
-                        }*/
-                        buyersAdsViewModel.setViewType(!state.isMapView)
-                        Log.d("BuyersAds TB", state.view.name)
-                        toggleMapView.invoke(state.isMapView)
-                    }
+                    onClick = toggleAdsViewMode
                 ) {
                     Icon(
-                        imageVector = Icons.Filled.Map,
+                        imageVector = if (state.isMapView) {
+                            RecircuIcons.Map
+                        } else {
+                            RecircuIcons.List
+                        },
                         contentDescription = null
                     )
                 }
@@ -122,27 +114,29 @@ fun BuyersAdsScreen(
             }
         )
         SearchBar(
-            query = query,
-            onQueryChange = {
-                query = it
-                active = it.isNotEmpty()
+            query = state.searchQuery,
+            onQueryChange = { newQueryText ->
+                onSearchQueryChange.invoke(newQueryText)
             },
-            onSearch = {
-                active = it.isNotEmpty()
+            onSearch = { query ->
+                onSearch.invoke(query)
                 keyboardController?.hide()
             },
             active = active,
             onActiveChange = {
             },
             leadingIcon = {
-                Icon(imageVector = Icons.Filled.Search, contentDescription = "Search")
+                Icon(
+                    imageVector = Icons.Filled.Search,
+                    contentDescription = "Search"
+                )
             },
             trailingIcon = {
-                Icon(imageVector = Icons.Filled.Clear,
+                Icon(
+                    imageVector = Icons.Filled.Clear,
                     contentDescription = "Clear",
                     modifier = Modifier.clickable {
-                        query = ""
-                        active = query.isNotEmpty()
+                        clearSearchQuery.invoke()
                     }
                 )
             },
@@ -157,47 +151,28 @@ fun BuyersAdsScreen(
         ) {
         }
         Spacer(modifier = Modifier.height(8.dp))
-//        when (state.view) {
-        /*BuyersAdsView.LIST -> {
-            LazyVerticalGrid(
-                state = lazyGridState,
-                columns = GridCells.Adaptive(160.dp),
-                modifier = Modifier
-                    .fillMaxSize()
-                    .then(modifier),
-                verticalArrangement = Arrangement.spacedBy(24.dp),
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                contentPadding = PaddingValues(16.dp)
-            ) {
-                item(span = { GridItemSpan(maxLineSpan) }) {
+        when (state.adsViewMode) {
+            BuyersAdsView.LIST -> {
+                LazyVerticalGrid(
+                    state = lazyGridState,
+                    columns = GridCells.Adaptive(160.dp),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .then(modifier),
+                    verticalArrangement = Arrangement.spacedBy(24.dp),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    contentPadding = PaddingValues(16.dp)
+                ) {
+                    item(span = { GridItemSpan(maxLineSpan) }) {
+                    }
                 }
             }
-        }
-        BuyersAdsView.MAP -> {
-            MapsRoute(
-                navigateBack = {}
-            )
-        }*/
-        if (state.isMapView) {
-            MapsRoute(
-                navigateBack = {},
-                requestFineLocationPermission = requestFineLocationPermission
-            )
-        } else {
-            LazyVerticalGrid(
-                state = lazyGridState,
-                columns = GridCells.Adaptive(160.dp),
-                modifier = Modifier
-                    .fillMaxSize()
-                    .then(modifier),
-                verticalArrangement = Arrangement.spacedBy(24.dp),
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                contentPadding = PaddingValues(16.dp)
-            ) {
-                item(span = { GridItemSpan(maxLineSpan) }) {
-                }
+            BuyersAdsView.MAP -> {
+                MapsRoute(
+                    navigateBack = {},
+                    requestFineLocationPermission = requestFineLocationPermission
+                )
             }
         }
-//        }
     }
 }
