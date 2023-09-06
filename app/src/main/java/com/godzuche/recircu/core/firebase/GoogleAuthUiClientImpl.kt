@@ -1,11 +1,11 @@
 package com.godzuche.recircu.core.firebase
+/*
 
 import android.content.Intent
 import android.content.IntentSender
 import android.util.Log
 import com.godzuche.recircu.BuildConfig
 import com.godzuche.recircu.feature.authentication.presentation.SignInResult
-import com.godzuche.recircu.feature.authentication.presentation.UserData
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.BeginSignInRequest.GoogleIdTokenRequestOptions
 import com.google.android.gms.auth.api.identity.SignInClient
@@ -30,7 +30,7 @@ class GoogleAuthUiClientImpl @Inject constructor(
                 buildSignInRequest()
             ).await()
             OneTapSignInResponse.Success(
-                data = signInResult?.pendingIntent?.intentSender
+                data = signInResult.pendingIntent.intentSender
             )
         } catch (e: Exception) {
             e.printStackTrace()
@@ -38,6 +38,8 @@ class GoogleAuthUiClientImpl @Inject constructor(
 //            Log.d(TAG, "Can't open One Tap UI: ${e.message}")
 //            null
             OneTapSignInResponse.Failure(e)
+            // No saved credentials found. Try launching the One Tap sign-up flow, or
+            // do nothing and continue presenting the signed-out UI.
             try {
                 val signUpResult = oneTapClient.beginSignIn(
                     buildSignUpRequest()
@@ -46,6 +48,8 @@ class GoogleAuthUiClientImpl @Inject constructor(
                     data = signUpResult?.pendingIntent?.intentSender
                 )
             } catch (e: Exception) {
+                e.printStackTrace()
+                if (e is CancellationException) throw e
                 OneTapSignInResponse.Failure(e)
             }
         }
@@ -91,11 +95,16 @@ class GoogleAuthUiClientImpl @Inject constructor(
             var msg = ""
             if (it is ApiException) {
                 when (it.statusCode) {
+                    CommonStatusCodes.CANCELED -> {
+                        Log.d(TAG, "One-tap dialog was closed.")
+                        // Todo: Temporary disable the One Tap sign-in UI
+                    }
                     CommonStatusCodes.NETWORK_ERROR -> {
                         Log.d(TAG, "One-tap encountered a network error.")
                     }
                     CommonStatusCodes.INTERNAL_ERROR -> {
                         msg = "Oops! An error occurred! Please check internet connection"
+                        Log.d(TAG, msg)
                     }
                     else -> Log.d(TAG, "One-tap encountered an else api error.")
                 }
@@ -162,4 +171,4 @@ sealed interface OneTapSignInResponse {
 sealed interface AuthResult {
     object Success : AuthResult
     data class Failure(val e: Exception) : AuthResult
-}
+}*/

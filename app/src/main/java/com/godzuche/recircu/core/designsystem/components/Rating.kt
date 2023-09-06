@@ -49,6 +49,7 @@ fun RecircuRatingBar(
                                 selected = true
                                 onRatingChange.invoke(index)
                             }
+
                             MotionEvent.ACTION_UP -> {
                                 selected = false
                             }

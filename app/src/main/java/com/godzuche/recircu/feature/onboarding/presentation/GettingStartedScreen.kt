@@ -1,4 +1,4 @@
-package com.godzuche.recircu.feature.getting_started
+package com.godzuche.recircu.feature.onboarding.presentation
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
@@ -16,6 +16,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.godzuche.recircu.core.designsystem.components.GradientBackground
 import com.godzuche.recircu.core.designsystem.components.RecircuButton
 import com.godzuche.recircu.core.designsystem.theme.RecircuTheme
@@ -23,11 +24,15 @@ import com.godzuche.recircu.core.designsystem.theme.RecircuTheme
 @Composable
 fun GetStartedRoute(
     navigateToAuthentication: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onboardingViewModel: OnboardingViewModel = hiltViewModel()
 ) {
     GettingStartedScreen(
-        navigateToAuthentication = navigateToAuthentication,
-        modifier = modifier
+        modifier = modifier,
+        navigateToAuthentication = {
+            onboardingViewModel.saveOnboardingState(isOnboardingCompleted = true)
+            navigateToAuthentication.invoke()
+        }
     )
 }
 

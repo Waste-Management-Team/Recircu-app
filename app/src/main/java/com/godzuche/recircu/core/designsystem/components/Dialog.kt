@@ -25,7 +25,7 @@ fun PermissionDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         modifier = modifier,
-        properties = DialogProperties(),
+        properties = DialogProperties(usePlatformDefaultWidth = false),
         title = {
             Text(text = "Permission Required")
         },

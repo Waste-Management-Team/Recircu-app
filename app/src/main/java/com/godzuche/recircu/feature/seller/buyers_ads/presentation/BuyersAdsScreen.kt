@@ -1,8 +1,21 @@
 package com.godzuche.recircu.feature.seller.buyers_ads.presentation
 
-import androidx.compose.animation.*
+import android.location.Location
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandIn
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkOut
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -12,8 +25,14 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.*
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.SearchBar
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -29,18 +48,22 @@ import com.godzuche.recircu.feature.google_maps.presentation.MapsRoute
 @Composable
 fun BuyersAdsRoute(
     appMainViewModel: AppMainViewModel,
-    requestFineLocationPermission: () -> Unit,
     navigateUp: () -> Unit,
     buyersAdsViewModel: BuyersAdsViewModel = hiltViewModel()
 ) {
-    // Todo: remove the requestFineLocationPermission parameter and use the getLocation() function in
-    //  appMainViewModel or better still create a separate function to request the permission in the viewModel
     val buyersAdsState by buyersAdsViewModel.state.collectAsStateWithLifecycle()
+    val lastLocation by appMainViewModel.lastLocation.collectAsStateWithLifecycle()
+
+    LaunchedEffect(key1 = true) {
+        if (buyersAdsState.isMapView) {
+            appMainViewModel.getLastLocation()
+        }
+    }
 
     BuyersAdsScreen(
+        lastLocation = lastLocation,
         uiState = buyersAdsState,
         onBackPress = navigateUp,
-        requestFineLocationPermission = requestFineLocationPermission,
         toggleAdsViewMode = {
             // Try to get last location when switching to Map view and request fine location permission if needed
             if (buyersAdsState.isMapView.not()) appMainViewModel.getLastLocation()
@@ -58,10 +81,10 @@ fun BuyersAdsRoute(
 )
 @Composable
 fun BuyersAdsScreen(
+    lastLocation: Location?,
     uiState: BuyersAdsState,
     onBackPress: () -> Unit,
     toggleAdsViewMode: () -> Unit,
-    requestFineLocationPermission: () -> Unit,
     onSearchQueryChange: (String) -> Unit,
     onSearch: (String) -> Unit,
     clearSearchQuery: () -> Unit,
@@ -175,10 +198,11 @@ fun BuyersAdsScreen(
                     }
                 }
             }
+
             BuyersAdsView.MAP -> {
                 MapsRoute(
                     navigateBack = {},
-                    requestFineLocationPermission = requestFineLocationPermission
+                    lastLocation = null
                 )
             }
         }

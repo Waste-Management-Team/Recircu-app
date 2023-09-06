@@ -1,4 +1,4 @@
-package com.godzuche.recircu.navigation
+package com.godzuche.recircu.feature.seller.seller_dashboard.navigation
 
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.navigation.NavController

@@ -1,5 +1,6 @@
 package com.godzuche.recircu.feature.seller.seller_dashboard.presentation
 
+import android.location.Location
 import androidx.annotation.StringRes
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
@@ -14,7 +15,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -23,40 +23,38 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.godzuche.recircu.AppMainViewModel
 import com.godzuche.recircu.R
+import com.godzuche.recircu.UserAuthState
 import com.godzuche.recircu.core.designsystem.components.HomeTopAppBar
 import com.godzuche.recircu.core.designsystem.icon.RecircuIcon
 import com.godzuche.recircu.core.designsystem.icon.RecircuIcons
 import com.godzuche.recircu.core.designsystem.theme.RecircuTheme
 import com.godzuche.recircu.core.designsystem.theme.fontFamily
-import com.godzuche.recircu.core.firebase.GoogleAuthUiClientImpl
+import com.godzuche.recircu.core.domain.UserData
 import com.godzuche.recircu.core.ui.removeWidthConstraint
-import com.google.android.gms.auth.api.identity.Identity
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
 
 @Composable
 fun SellerHomeRoute(
-    modifier: Modifier = Modifier,
+    appMainViewModel: AppMainViewModel,
     navigateToBuyer: (BuyerAd) -> Unit,
     navigateToBuyersAds: () -> Unit,
-    viewModel: SellerHomeViewModel = hiltViewModel()
+    modifier: Modifier = Modifier,
+    sellerHomeViewModel: SellerHomeViewModel = hiltViewModel()
 ) {
-    val userState by viewModel.userState.collectAsStateWithLifecycle()
-    val state by viewModel.state.collectAsStateWithLifecycle()
-
-    val context = LocalContext.current
-    val googleAuthUiClientImpl = GoogleAuthUiClientImpl(
-        auth = Firebase.auth,
-        oneTapClient = Identity.getSignInClient(context)
-    )
-
-    viewModel.onGetCurrentUser(googleAuthUiClientImpl.getSignedInUser())
+    LaunchedEffect(key1 = true) {
+        appMainViewModel.getCurrentUser()
+        appMainViewModel.getLastLocation()
+    }
+    val state by sellerHomeViewModel.state.collectAsStateWithLifecycle()
+    val userState by appMainViewModel.userAuthState.collectAsStateWithLifecycle()
+    val lastLocation by appMainViewModel.lastLocation.collectAsStateWithLifecycle()
 
     SellerHomeScreen(
         userState = userState,
         uiState = state,
-        filterBuyersAds = viewModel::filterBuyersAds,
+        lastLocation = lastLocation,
+        filterBuyersAds = sellerHomeViewModel::filterBuyersAds,
         navigateToBuyer = navigateToBuyer,
         navigateToBuyersAds = navigateToBuyersAds,
         modifier = modifier
@@ -66,8 +64,9 @@ fun SellerHomeRoute(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SellerHomeScreen(
-    userState: UserState,
+    userState: UserAuthState,
     uiState: SellerHomeUiState,
+    lastLocation: Location?,
     filterBuyersAds: (WasteType, Boolean) -> Unit,
     navigateToBuyer: (BuyerAd) -> Unit,
     navigateToBuyersAds: () -> Unit,
@@ -84,7 +83,11 @@ fun SellerHomeScreen(
             .then(modifier)
     ) {
         item(span = { GridItemSpan(maxLineSpan) }) {
-            HomeTopAppBar(scrollBehavior = null, userState = userState)
+            HomeTopAppBar(
+                scrollBehavior = null,
+                userState = userState,
+                location = lastLocation
+            )
         }
         item(span = { GridItemSpan(maxLineSpan) }) {
             AccountBalance()
@@ -254,11 +257,13 @@ sealed class WasteType(
 @Composable
 fun HomePreview() {
     RecircuTheme {
-        SellerHomeScreen(uiState = SellerHomeUiState(),
-            userState = UserState.Success(user = User("God'swill", "", "", "")),
+        SellerHomeScreen(
+            userState = UserAuthState.SignedIn(userData = UserData("God'swill", "", "", "")),
+            uiState = SellerHomeUiState(),
             filterBuyersAds = { a, b -> },
             navigateToBuyer = {},
-            navigateToBuyersAds = {}
+            navigateToBuyersAds = {},
+            lastLocation = null
         )
     }
 }

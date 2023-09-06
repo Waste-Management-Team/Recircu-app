@@ -37,7 +37,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
@@ -45,30 +44,27 @@ import coil.size.Size
 import com.godzuche.recircu.AppMainViewModel
 import com.godzuche.recircu.ConfirmActions
 import com.godzuche.recircu.ConfirmationDialog
+import com.godzuche.recircu.UserAuthState
 import com.godzuche.recircu.core.designsystem.components.RecircuAnimatedCircle
 import com.godzuche.recircu.core.designsystem.icon.RecircuIcons
 import com.godzuche.recircu.core.designsystem.theme.fontFamily
-import com.godzuche.recircu.core.firebase.GoogleAuthUiClient
+import com.godzuche.recircu.core.domain.UserData
 import com.godzuche.recircu.feature.seller.seller_dashboard.presentation.HomeSection
-import com.godzuche.recircu.feature.seller.seller_dashboard.presentation.User
-import com.godzuche.recircu.feature.seller.seller_dashboard.presentation.UserState
 import com.godzuche.recircu.feature.seller.seller_dashboard.presentation.WasteType
 
 @Composable
 fun SellerProfileRoute(
+    appMainViewModel: AppMainViewModel,
     navigateToAuthentication: () -> Unit,
-    googleAuthUiClient: GoogleAuthUiClient,
-    modifier: Modifier = Modifier,
-    sellerProfileViewModel: SellerProfileViewModel = hiltViewModel(),
-    appMainViewModel: AppMainViewModel
+    modifier: Modifier = Modifier
 ) {
-    val userState by sellerProfileViewModel.userState.collectAsStateWithLifecycle()
+//    val userState by sellerProfileViewModel.userState.collectAsStateWithLifecycle()
+    val userAuthState by appMainViewModel.userAuthState.collectAsStateWithLifecycle()
 
-    sellerProfileViewModel.onGetCurrentUser(googleAuthUiClient.getSignedInUser())
+    appMainViewModel.getCurrentUser()
 
     SellerProfileScreen(
-        modifier = modifier,
-        userState = userState,
+        userAuthState = userAuthState,
         onSignOutClick = {
             appMainViewModel.setDialogState(
                 shouldShow = true,
@@ -77,19 +73,22 @@ fun SellerProfileRoute(
                     descriptionText = "Are you sure you want to sign out?",
                     cancelText = "Cancel",
                     okText = "Sign out",
-                    action = ConfirmActions.SIGN_OUT
+                    action = ConfirmActions.SIGN_OUT,
                 )
             )
-        }
+        },
+        navigateToAuthentication = navigateToAuthentication,
+        modifier = modifier,
     )
 }
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun SellerProfileScreen(
-    userState: UserState,
+    userAuthState: UserAuthState,
     onSignOutClick: () -> Unit,
-    modifier: Modifier = Modifier
+    navigateToAuthentication: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val lazyGridState = rememberLazyGridState()
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
@@ -105,13 +104,15 @@ fun SellerProfileScreen(
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
         item(span = { GridItemSpan(maxLineSpan) }) {
-            when (userState) {
-                is UserState.Loading -> {}
-                is UserState.Success -> {
+            when (userAuthState) {
+                is UserAuthState.Loading -> Unit
+                is UserAuthState.SignedIn -> {
                     ProfileHeader(
-                        user = userState.user
+                        userData = userAuthState.userData
                     )
                 }
+
+                else -> Unit
             }
         }
         item(span = { GridItemSpan(maxLineSpan) }) {
@@ -530,19 +531,19 @@ fun Balance() {
 @Composable
 fun ProfileHeader(
     modifier: Modifier = Modifier,
-    user: User
+    userData: UserData
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
     ) {
         ProfileImage(
-            photo = user.photo
+            photo = userData.profilePictureUrl
         )
         Spacer(modifier = Modifier.height(16.dp))
         CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.high) {
             Text(
-                text = user.name,
+                text = userData.displayName ?: "Unknown",
                 style = MaterialTheme.typography.titleLarge,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
@@ -550,7 +551,7 @@ fun ProfileHeader(
         }
         Spacer(modifier = Modifier.height(4.dp))
         CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-            user.email?.let {
+            userData.email?.let {
                 Text(
                     text = it,
                     style = MaterialTheme.typography.titleSmall,

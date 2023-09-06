@@ -17,14 +17,12 @@ fun NavController.navigateToBuyersAds(navOptions: NavOptions? = null) {
 @OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.buyersAdsScreen(
     appMainViewModel: AppMainViewModel,
-    navigateUp: () -> Unit,
-    requestFineLocationPermission: () -> Unit
+    navigateUp: () -> Unit
 ) {
     composable(route = buyersAdsRoute) {
         BuyersAdsRoute(
             appMainViewModel = appMainViewModel,
-            navigateUp = navigateUp,
-            requestFineLocationPermission = requestFineLocationPermission
+            navigateUp = navigateUp
         )
     }
 }

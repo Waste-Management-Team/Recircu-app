@@ -1,8 +1,8 @@
-package com.godzuche.recircu.navigation
+package com.godzuche.recircu.feature.authentication.navigation
 
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.navigation.NavGraphBuilder
-import com.godzuche.recircu.feature.authentication.UserSelectionRoute
+import com.godzuche.recircu.feature.authentication.presentation.UserSelectionRoute
 import com.google.accompanist.navigation.animation.composable
 
 const val userSelectionRoute = "user_selection_route"

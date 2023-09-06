@@ -161,9 +161,11 @@ fun SellerExploreScreen(
                     ExploreTab.EVENT -> {
                         "Events will appear here"
                     }
+
                     ExploreTab.DISCOVER -> {
                         "Posts including news will appear here"
                     }
+
                     ExploreTab.LEARN -> {
                         "Educational section"
                     }
@@ -194,6 +196,7 @@ fun WasteLiveValues(
                 MaterialTheme.colorScheme.primary
             )
         }
+
         wasteType.valueChange < 0 -> {
             Triple(
                 "N" + wasteType.value.toString(),
@@ -201,6 +204,7 @@ fun WasteLiveValues(
                 Color.Red
             )
         }
+
         else -> {
             Triple(
                 "N" + wasteType.value.toString(),
@@ -288,11 +292,11 @@ private fun ExploreTabIndicator(
     ) { exploreTab ->
         tabPositions[exploreTab.ordinal].right
     }
-/*    val color by transition.animateColor(
-        label = "Border color"
-    ) { page ->
-        if (page == TabPage.Home) Purple700 else Green800
-    }*/
+    /*    val color by transition.animateColor(
+            label = "Border color"
+        ) { page ->
+            if (page == TabPage.Home) Purple700 else Green800
+        }*/
     Box(
         Modifier
             .fillMaxSize()

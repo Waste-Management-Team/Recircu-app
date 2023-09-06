@@ -5,7 +5,15 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
@@ -13,8 +21,17 @@ import androidx.compose.material.ContentAlpha
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Login
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Divider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -26,47 +43,75 @@ import com.godzuche.recircu.R
 import com.godzuche.recircu.core.designsystem.components.AuthTextButton
 import com.godzuche.recircu.core.designsystem.components.GoogleSignInButton
 import com.godzuche.recircu.core.designsystem.components.RecircuButton
-import com.godzuche.recircu.core.firebase.GoogleAuthUiClient
-import com.godzuche.recircu.core.firebase.OneTapSignInResponse
+import com.google.android.gms.auth.api.identity.BeginSignInResult
+import com.google.android.gms.auth.api.identity.SignInClient
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.common.api.CommonStatusCodes
 import kotlinx.coroutines.launch
 
 @Composable
 fun SellerSignInRoute(
+    oneTapClient: SignInClient,
     navigateToHome: () -> Unit,
-    googleAuthUiClient: GoogleAuthUiClient,
     signInViewModel: SignInViewModel = hiltViewModel()
 ) {
-    val state by signInViewModel.state.collectAsStateWithLifecycle()
+    val state by signInViewModel.authState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
+    val isLoading = (state is SignInUiState.Loading)
+    val isSignInError = (state is SignInUiState.Error)
+    val isOneTapUi = (state is SignInUiState.OneTapUi<*>)
+    val isSignInSuccessful = state is SignInUiState.Success
 
     val googleSignLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartIntentSenderForResult(),
         onResult = { activityResult ->
             if (activityResult.resultCode == RESULT_OK) {
                 coroutineScope.launch {
-                    val signInResult = googleAuthUiClient.signInWithIntent(
-                        intent = activityResult.data ?: return@launch
-                    )
-                    signInViewModel.onSignInResult(signInResult)
+                    val intent = activityResult.data ?: return@launch
+                    val credential = oneTapClient.getSignInCredentialFromIntent(intent)
+                    signInViewModel.googleSignIn(signInCredential = credential)
                 }
             }
         }
     )
 
-    LaunchedEffect(key1 = state.signInError) {
-        state.signInError?.let { error ->
-            Toast.makeText(
-                context,
-                error,
-                Toast.LENGTH_LONG
-            ).show()
+    SignInScreen(
+        isLoading = isLoading,
+        onGoogleSignInClick = {
+            signInViewModel.requestOneTapSignIn()
+        },
+        onSignInClick = {
+            // Todo: Implement sign-in with email and password
+            navigateToHome.invoke()
+        }
+    )
+
+    LaunchedEffect(key1 = isSignInError) {
+        if (isSignInError) {
+            (state as SignInUiState.Error).exception?.let { error ->
+                Toast.makeText(
+                    context,
+                    error.localizedMessage,
+                    Toast.LENGTH_LONG
+                ).show()
+            }
         }
     }
-    LaunchedEffect(key1 = state.isSignInSuccessful) {
-        if (state.isSignInSuccessful) {
+
+    LaunchedEffect(key1 = isOneTapUi) {
+        if (isOneTapUi) {
+            val signInIntentSender = (state as SignInUiState.OneTapUi<*>).data
+            googleSignLauncher.launch(
+                IntentSenderRequest.Builder(
+                    (signInIntentSender as BeginSignInResult).pendingIntent.intentSender
+                ).build()
+            )
+        }
+    }
+
+    LaunchedEffect(key1 = isSignInSuccessful) {
+        if (isSignInSuccessful) {
             Toast.makeText(
                 context,
                 "Sign in successful!",
@@ -75,69 +120,31 @@ fun SellerSignInRoute(
             navigateToHome.invoke()
         }
     }
-
-    SignInScreen(
-        onGoogleSignInClick = {
-            coroutineScope.launch {
-                val signInIntentSender =
-                    when (val oneTapSignInRespose = googleAuthUiClient.signIn()) {
-                        is OneTapSignInResponse.Success -> oneTapSignInRespose.data
-                        is OneTapSignInResponse.Failure -> {
-                            Toast.makeText(
-                                context,
-                                getOneTapAuthErrorText(oneTapSignInRespose.e),
-                                Toast.LENGTH_LONG
-                            ).show()
-                            null
-                        }
-                    }
-                googleSignLauncher.launch(
-                    IntentSenderRequest.Builder(
-                        signInIntentSender ?: return@launch
-                    ).build()
-                )
-            }
-        },
-        onSignInClick = {
-            // Sign in with email and password
-            navigateToHome.invoke()
-        }
-    )
 }
 
-fun getOneTapAuthErrorText(e: Exception): String {
-    return if (e is ApiException) {
-        when (e.status.statusCode) {
+fun Exception.getOneTapAuthErrorText(): String {
+    return if (this is ApiException) {
+        when (this.status.statusCode) {
             CommonStatusCodes.NETWORK_ERROR -> "Network Error: Please check your internet connection"
             CommonStatusCodes.INTERNAL_ERROR -> "Oops! An error occurred! Please check internet connection"
-            else -> e.message ?: "Oops! An error occurred!"
+            else -> this.message ?: "Oops! An error occurred!"
         }
-    } else e.message ?: "Oops! An error occurred!"
+    } else this.message ?: "Oops! An error occurred!"
 }
 
 @Composable
 fun SignInScreen(
-    modifier: Modifier = Modifier,
     onGoogleSignInClick: () -> Unit,
-    onSignInClick: () -> Unit
-//    viewModel: AuthViewModel = hiltViewModel()
+    onSignInClick: () -> Unit,
+    isLoading: Boolean,
+    modifier: Modifier = Modifier
 ) {
     val lazyGridState = rememberLazyGridState()
-
-
-/*    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        if (googleSignInState.loading) {
-            CircularProgressIndicator()
-        }
-    }*/
 
     LazyVerticalGrid(
         state = lazyGridState,
         columns = GridCells.Fixed(1),
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(
             space = 8.dp,
@@ -246,6 +253,14 @@ fun SignInScreen(
                 icon = Icons.Filled.Login,
                 modifier = Modifier.fillMaxWidth()
             )
+        }
+    }
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        if (isLoading) {
+            CircularProgressIndicator()
         }
     }
 }

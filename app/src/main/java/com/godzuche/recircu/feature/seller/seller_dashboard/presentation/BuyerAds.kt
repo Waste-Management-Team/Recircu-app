@@ -1,7 +1,6 @@
 package com.godzuche.recircu.feature.seller.seller_dashboard.presentation
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
@@ -19,7 +18,6 @@ import androidx.compose.ui.unit.sp
 import com.godzuche.recircu.R
 import com.godzuche.recircu.core.designsystem.theme.fontFamily
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun BuyerAdsSection(
     modifier: Modifier = Modifier,

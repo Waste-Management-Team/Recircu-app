@@ -2,14 +2,27 @@ package com.godzuche.recircu.feature.seller.seller_dashboard.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.godzuche.recircu.feature.authentication.presentation.UserData
+import com.godzuche.recircu.UserAuthState
+import com.godzuche.recircu.core.common.RecircuResult
+import com.godzuche.recircu.core.data.repository.AuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class SellerHomeViewModel @Inject constructor() : ViewModel() {
+class SellerHomeViewModel @Inject constructor(
+    private val authRepository: AuthRepository
+) : ViewModel() {
     private val sampleUser = User(
         name = "God'swill",
         photo = null,
@@ -22,8 +35,9 @@ class SellerHomeViewModel @Inject constructor() : ViewModel() {
         BuyerAd(WasteType.Metal, 15, 2),
     )
 
-    private var _userState: MutableStateFlow<UserState> = MutableStateFlow(UserState.Loading)
-    val userState: StateFlow<UserState> get() = _userState.asStateFlow()
+    private var _userState: MutableStateFlow<UserAuthState> =
+        MutableStateFlow(UserAuthState.Loading)
+    val userState: StateFlow<UserAuthState> get() = _userState.asStateFlow()
 
     private val wasteTypes = MutableStateFlow(
         mutableSetOf<WasteType>()
@@ -66,16 +80,29 @@ class SellerHomeViewModel @Inject constructor() : ViewModel() {
         }
     }
 
-    fun onGetCurrentUser(userData: UserData?) {
-        _userState.update {
-            UserState.Success(
-                User(
-                    name = userData?.displayName ?: "No name",
-                    photo = userData?.profilePictureUrl,
-                    email = userData?.email,
-                    location = sampleUser.location
-                )
-            )
+    fun getCurrentUser() {
+        viewModelScope.launch(Dispatchers.IO) {
+            authRepository.getSignedInUser().onEach { result ->
+                when (result) {
+                    is RecircuResult.Loading -> {
+                        _userState.update {
+                            UserAuthState.Loading
+                        }
+                    }
+
+                    is RecircuResult.Success -> {
+                        result.data?.let {
+                            _userState.update {
+                                UserAuthState.SignedIn(userData = result.data)
+                            }
+                        } ?: _userState.update {
+                            UserAuthState.NotSignedIn
+                        }
+                    }
+
+                    else -> Unit
+                }
+            }.launchIn(viewModelScope)
         }
     }
 
@@ -104,14 +131,6 @@ class SellerHomeViewModel @Inject constructor() : ViewModel() {
             }
         }
     }
-}
-
-//Todo: include the user state in the uiState
-sealed interface UserState {
-    object Loading : UserState
-    data class Success(
-        val user: User
-    ) : UserState
 }
 
 data class User(

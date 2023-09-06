@@ -1,5 +1,6 @@
 package com.godzuche.recircu.feature.google_maps.presentation
 
+import android.location.Location
 import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,38 +15,40 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.godzuche.recircu.core.designsystem.icon.RecircuIcons
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
-import com.google.maps.android.compose.*
+import com.google.maps.android.compose.CameraPositionState
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.MapUiSettings
+import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MarkerState
+import com.google.maps.android.compose.rememberCameraPositionState
 
 @Composable
 fun MapsRoute(
+    lastLocation: Location?,
     navigateBack: () -> Unit,
-    requestFineLocationPermission: () -> Unit,
     mapsViewModel: MapsViewModel = hiltViewModel()
 ) {
-//    viewModel.getLastLocation()
     val mapState by mapsViewModel.state.collectAsStateWithLifecycle()
 
     MapsScreen(
         mapsState = mapState,
-        navigateBack = navigateBack,
-        requestFineLocationPermission = requestFineLocationPermission
+        navigateBack = navigateBack
     )
 }
 
 @Composable
 fun MapsScreen(
     mapsState: MapsState,
-    navigateBack: () -> Unit,
-    requestFineLocationPermission: () -> Unit
+    navigateBack: () -> Unit
 ) {
-/*
-    if (!mapsState.isLocationPermissionEnabled) {
-        Log.d("Location", "reqPerms in map screen")
-        requestFineLocationPermission.invoke()
-    } else {
-        Log.d("Location", "reqPerms in map screen else")
-    }
-*/
+    /*
+        if (!mapsState.isLocationPermissionEnabled) {
+            Log.d("Location", "reqPerms in map screen")
+            requestFineLocationPermission.invoke()
+        } else {
+            Log.d("Location", "reqPerms in map screen else")
+        }
+    */
 
     val lastLocation = mapsState.lastLocation?.let {
         LatLng(it.latitude, it.longitude)

@@ -1,5 +1,7 @@
 package com.godzuche.recircu.core.designsystem.components
 
+import android.location.Location
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -14,17 +16,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavDestination
 import com.godzuche.recircu.R
+import com.godzuche.recircu.UserAuthState
 import com.godzuche.recircu.core.designsystem.icon.RecircuIcons
 import com.godzuche.recircu.core.ui.shimmerEffect
+import com.godzuche.recircu.feature.onboarding.navigation.gettingStartedRoute
 import com.godzuche.recircu.feature.seller.buyers_ads.navigation.buyersAdsRoute
-import com.godzuche.recircu.feature.seller.seller_dashboard.presentation.UserState
+import com.godzuche.recircu.feature.seller.seller_dashboard.navigation.buyerDetailsRoute
 import com.godzuche.recircu.navigation.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeTopAppBar(
-    scrollBehavior: TopAppBarScrollBehavior?,
-    userState: UserState
+    userState: UserAuthState,
+    location: Location?,
+    scrollBehavior: TopAppBarScrollBehavior?
 ) {
     Surface {
         Row(
@@ -35,7 +40,7 @@ fun HomeTopAppBar(
                 .statusBarsPadding()
         ) {
             when (userState) {
-                is UserState.Loading -> {
+                is UserAuthState.Loading -> {
                     Column {
                         Box(
                             modifier = Modifier
@@ -59,10 +64,11 @@ fun HomeTopAppBar(
                         )
                     }
                 }
-                is UserState.Success -> {
+
+                is UserAuthState.SignedIn -> {
                     Column {
                         Text(
-                            text = "Hi ${userState.user.name}!",
+                            text = "Hi ${userState.userData.displayName ?: "No name"}",
                             style = MaterialTheme.typography.titleSmall,
                             modifier = Modifier.paddingFromBaseline(bottom = 14.dp)
                         )
@@ -82,13 +88,23 @@ fun HomeTopAppBar(
                                 tint = MaterialTheme.colorScheme.primary
                             )
                             Text(
-                                userState.user.location,
+                                text = if (location == null) {
+                                    Log.d("TopBar", "Location = null")
+                                    "Unknown"
+                                } else {
+                                    Log.d("TopBar", "Location != null")
+                                    "Rivers State University"
+                                },
                                 style = MaterialTheme.typography.labelMedium,
                                 color = MaterialTheme.colorScheme.primary
                             )
                         }
                     }
                 }
+
+                is UserAuthState.NotSignedIn -> {}
+                is UserAuthState.Error -> {}
+                else -> Unit
             }
             FilledTonalIconButton(
                 onClick = {}
@@ -112,7 +128,10 @@ fun RecircuTopBar(
     navigateToAccount: () -> Unit
 ) {
     if (topLevelDestination != null) {
-        if (topLevelDestination != RecircuTopLevelDestination.SELLER_HOME) {
+        val shouldShowTopBar =
+            topLevelDestination != RecircuTopLevelDestination.SELLER_HOME &&
+                    topLevelDestination != RecircuTopLevelDestination.USER_SELECTION
+        if (shouldShowTopBar) {
             MediumTopAppBar(
                 title = { Text(stringResource(topLevelDestination.titleTextId!!)) },
                 scrollBehavior = scrollBehavior,
@@ -128,6 +147,7 @@ fun RecircuTopBar(
                                 )
                             }
                         }
+
                         else -> Unit
                     }
                 }
@@ -157,6 +177,7 @@ fun RecircuTopBar(
                         scrollBehavior = scrollBehavior
                     )
                 }
+
                 buyersAdsRoute -> Unit
                 else -> {
                     MediumTopAppBar(

@@ -1,10 +1,11 @@
-package com.godzuche.recircu.navigation
+package com.godzuche.recircu.feature.authentication.navigation
 
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.navigation
-import com.godzuche.recircu.core.firebase.GoogleAuthUiClient
+import com.godzuche.recircu.navigation.sellerSignUpScreen
+import com.google.android.gms.auth.api.identity.SignInClient
 
 const val sellerAuthGraphRoute = "seller_auth_graph"
 
@@ -13,7 +14,7 @@ fun NavController.navigateToSellerAuth(navOptions: NavOptions? = null) {
 }
 
 fun NavGraphBuilder.sellerAuthGraph(
-    googleAuthUiClient: GoogleAuthUiClient,
+    oneTapClient: SignInClient,
     navigateToHome: () -> Unit
 ) {
     navigation(
@@ -21,7 +22,7 @@ fun NavGraphBuilder.sellerAuthGraph(
         startDestination = sellerSignInRoute
     ) {
         sellerSignInScreen(
-            googleAuthUiClient = googleAuthUiClient,
+            oneTapClient = oneTapClient,
             navigateToHome = navigateToHome
         )
         sellerSignUpScreen()

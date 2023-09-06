@@ -42,6 +42,7 @@ fun WasteTypesGridItem(
                         modifier = Modifier.size(54.dp)
                     )
                 }
+
                 is RecircuIcon.ImageVectorIcon -> {
                     Icon(
                         imageVector = wasteType.icon.imageVector,

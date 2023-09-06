@@ -4,12 +4,10 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.navigation
-import com.godzuche.recircu.navigation.userSelectionRoute
-import com.godzuche.recircu.navigation.userSelectionScreen
 
 const val authGraphRoute = "auth_route"
 
-fun NavController.navigateToAuth(navOptions: NavOptions? = null) {
+fun NavController.navigateToAuthGraph(navOptions: NavOptions? = null) {
     this.navigate(authGraphRoute, navOptions)
 }
 

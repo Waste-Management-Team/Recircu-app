@@ -4,8 +4,6 @@ import com.godzuche.recircu.core.data.repository.AuthRepository
 import com.godzuche.recircu.core.data.repository.AuthRepositoryImpl
 import com.godzuche.recircu.core.data.repository.OfflineFirstUserDataRepository
 import com.godzuche.recircu.core.data.repository.UserDataRepository
-import com.godzuche.recircu.core.firebase.GoogleAuthUiClient
-import com.godzuche.recircu.core.firebase.GoogleAuthUiClientImpl
 import com.godzuche.recircu.core.location.DefaultLocationClient
 import com.godzuche.recircu.core.location.LocationClient
 import dagger.Binds
@@ -31,8 +29,4 @@ interface DataModule {
         authRepository: AuthRepositoryImpl
     ): AuthRepository
 
-    @Binds
-    fun bindGoogleAuthUiClient(
-        googleAuthUiClient: GoogleAuthUiClientImpl
-    ): GoogleAuthUiClient
 }

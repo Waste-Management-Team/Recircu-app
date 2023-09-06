@@ -35,5 +35,6 @@ enum class RecircuTopLevelDestination(
         iconTextId = R.string.profile,
         titleTextId = R.string.profile
     ),
+    USER_SELECTION,
     GETTING_STARTED
 }
