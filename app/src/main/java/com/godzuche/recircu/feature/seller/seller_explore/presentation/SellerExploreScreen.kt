@@ -1,8 +1,6 @@
 package com.godzuche.recircu.feature.seller.seller_explore.presentation
 
 import androidx.annotation.DrawableRes
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.snapping.SnapLayoutInfoProvider
@@ -17,8 +15,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ContentAlpha
-import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -54,7 +50,7 @@ fun SellerExploreRoute(
     )
 }
 
-@OptIn(ExperimentalAnimationApi::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SellerExploreScreen(
     uiState: SellerHomeUiState,
@@ -99,32 +95,6 @@ fun SellerExploreScreen(
                         item.title
                     }
                 ) { index, item ->
-                    /*val itemIndex = when (index) {
-                        0 -> spotlights.size - 1
-                        spotlights.size + 1 -> 0
-                        else -> {
-                            index - 1
-                        }
-                    }*/
-                    /*val realIndex = if (index >= spotlights.size) {
-                        index - spotlights.size
-                    } else {
-                        index
-                    }*/
-                    /*when (index) {
-                        0 -> {
-                            Log.d("Spotlight", "index = 0")
-                            val lastItem = infiniteList.last()
-                            infiniteList.add(0, lastItem)
-                            infiniteList.removeLast()
-                        }
-                        infiniteList.size - 1 -> {
-                            Log.d("Spotlight", "index = last")
-                            val firstItem = infiniteList.first()
-                            infiniteList.removeFirst()
-                            infiniteList.add(firstItem)
-                        }
-                    }*/
                     Spotlights(
                         spotlight = item,
                         spotlights = spotlights
@@ -156,29 +126,27 @@ fun SellerExploreScreen(
             )
         }
         item(span = { GridItemSpan(maxLineSpan) }) {
-            AnimatedContent(targetState = exploreTab) {
-                val msg = when (exploreTab) {
-                    ExploreTab.EVENT -> {
-                        "Events will appear here"
-                    }
-
-                    ExploreTab.DISCOVER -> {
-                        "Posts including news will appear here"
-                    }
-
-                    ExploreTab.LEARN -> {
-                        "Educational section"
-                    }
+            val msg = when (exploreTab) {
+                ExploreTab.EVENT -> {
+                    "Events will appear here"
                 }
-                CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled) {
-                    Text(
-                        text = msg,
-                        style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.fillMaxWidth(),
-                        textAlign = TextAlign.Center
-                    )
+
+                ExploreTab.DISCOVER -> {
+                    "Posts including news will appear here"
+                }
+
+                ExploreTab.LEARN -> {
+                    "Educational section"
                 }
             }
+
+            Text(
+                text = msg,
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.fillMaxWidth(),
+                color = MaterialTheme.colorScheme.onSurface,
+                textAlign = TextAlign.Center,
+            )
         }
     }
 }
