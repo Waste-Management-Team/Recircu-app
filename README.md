@@ -7,3 +7,23 @@ A waste management app that lets users manage their wastes properly while gettin
 | ---------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
 | ![Screen record - Dark Theme](https://github.com/Waste-Management-Team/Recircu-app/blob/main/app/screenrecord/Screen_recording_Recircu_Dark.gif) | ![Screen record - Light Theme](https://github.com/Waste-Management-Team/Recircu-app/blob/main/app/screenrecord/Screen_recording_Recircu_Light.gif) |
 
+<table>
+  <tr>
+    <td>
+      <img src="https://github.com/Waste-Management-Team/Recircu-app/blob/main/app/screenshots/onboarding.png" alt="Onboarding" width="200px">
+    </td>
+    <td>
+      <img src="https://github.com/Waste-Management-Team/Recircu-app/blob/main/app/screenshots/perms.png" alt="Permission" width="200px">
+    </td>
+    <td>
+      <img src="https://github.com/Waste-Management-Team/Recircu-app/blob/main/app/screenshots/user_selection.png" alt="User Selection" width="200px">
+    </td>
+    <td>
+      <img src="https://github.com/Waste-Management-Team/Recircu-app/blob/main/app/screenshots/auth_1.png" alt="Auth 1" width="200px">
+    </td>
+    <td>
+      <img src="https://github.com/Waste-Management-Team/Recircu-app/blob/main/app/screenshots/auth_2.png" alt="Auth 2" width="200px">
+    </td>
+  </tr>
+  
+</table>
